@@ -21,6 +21,8 @@ kitty
 neovim
 xclip
 fonts-jetbrains-mono
+fastfetch          # system info (fetch draws the animated logo beside it)
+imagemagick        # builds the fetch logo (fetch-logo)
 
 # yazi (file manager, from github-releases.txt) helpers:
 fd-find            # fast file search (Debian names it fdfind; linked to fd by the apt role)
