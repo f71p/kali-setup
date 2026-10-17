@@ -24,6 +24,7 @@ All support `-h`.
 | `cmd \| clip` | Copies output to the clipboard (reaches Windows). `clip file` copies a file. `clip` alone prints the clipboard |
 | `rec [label]` | Records the terminal to `$LOGS/<date>/<time>_<label>.log` until `exit`. tmux shows **● REC** |
 | `logcat file.log` | Shows a recording as plain text. Replay it live: `scriptreplay -T file.timing file.log` |
+| `keys [search]` | Search every keybind and command in this cheat sheet as you type. `keys copy` starts with "copy" typed in |
 | `fetch` | System info with the animated Kali logo. Runs by itself in each new kitty window (not in tmux panes) |
 | `fetch-logo` | Rebuilds the logo GIF, e.g. after changing the kitty background (`FETCH_LOGO_BG='#000000' fetch-logo`) |
 | `timesync <dc>` | Clock on the DC's time (Kerberos "clock skew too great"). Undo: `timesync reset` |
@@ -52,7 +53,6 @@ All support `-h`.
 | `Ctrl+R` | Fuzzy search command history |
 | `Ctrl+T` / `Ctrl+F` | Insert a file path (fuzzy, with a preview, images too), e.g. `cat ` then `Ctrl+F`. `Tab` marks several |
 | `Alt+C` | cd into a folder (fuzzy) |
-| `Esc` `Esc` | Put `sudo` in front of the command (the last one if the line is empty); again to remove it |
 | `z <part>` | Jump to a frequently used folder (`z setup` → `~/Projects/setup`) |
 | `zi` | Pick a frequent folder from a list |
 
@@ -64,6 +64,7 @@ All support `-h`.
 | `Ctrl+U` | Delete to start of line |
 | `Ctrl+W` | Delete previous word |
 | `Ctrl+←` / `Ctrl+→` | Move by word |
+| `Esc` `Esc` | Put `sudo` in front of the command (the last one if the line is empty); again to remove it |
 | `Ctrl+P` | Toggle Kali's one-line / two-line prompt |
 
 The time on the right of the prompt is when that command was run (Enter pressed), handy for reports.
