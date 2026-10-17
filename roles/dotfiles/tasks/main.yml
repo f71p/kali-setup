@@ -53,3 +53,14 @@
     backup: true
   loop: "{{ lookup('community.general.filetree', configs_dir ~ '/system', wantlist=True) | selectattr('state', 'eq', 'file') | rejectattr('path', 'search', '\\.gitkeep$') | list }}"
   loop_control: { label: "/{{ item.path }}" }
+
+# Built from Kali's own logo (not stored in the repo); fetch falls back to plain fastfetch without it.
+# Skipped until imagemagick (apt tag) is installed.
+- name: Generate the fetch logo
+  ansible.builtin.shell: |
+    command -v convert >/dev/null || { echo skipped; exit 0; }
+    {{ target_home }}/.local/bin/fetch-logo
+  args:
+    creates: "{{ target_home }}/.local/share/fetch/logo.gif"
+  register: fetch_logo
+  changed_when: fetch_logo.stdout != 'skipped'

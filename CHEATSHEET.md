@@ -24,6 +24,8 @@ All support `-h`.
 | `cmd \| clip` | Copies output to the clipboard (reaches Windows). `clip file` copies a file. `clip` alone prints the clipboard |
 | `rec [label]` | Records the terminal to `$LOGS/<date>/<time>_<label>.log` until `exit`. tmux shows **● REC** |
 | `logcat file.log` | Shows a recording as plain text. Replay it live: `scriptreplay -T file.timing file.log` |
+| `fetch` | System info with the animated Kali logo. Runs by itself in each new kitty window (not in tmux panes) |
+| `fetch-logo` | Rebuilds the logo GIF, e.g. after changing the kitty background (`FETCH_LOGO_BG='#000000' fetch-logo`) |
 | `y` | Opens yazi (file manager). Quitting with `q` leaves you in the folder you were in |
 | `history -i 1` | Every command with date/time (`history -i -20` for the last 20) |
 

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# fetch-logo [output.gif] — generate the animated neon "glitch" Kali dragon used by `fetch`.
+# Built from Kali's own boot logo on this machine, so no artwork lives in the repo.
+# Default output: ~/.local/share/fetch/logo.gif. Background colour: $FETCH_LOGO_BG (kitty's).
+set -euo pipefail
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"; exit 0
+fi
+SRC=/usr/share/plymouth/themes/kali/kali-logo.png
+OUT=${1:-$HOME/.local/share/fetch/logo.gif}
+[ -f "$SRC" ] || { echo "fetch-logo: $SRC not found (not Kali?)" >&2; exit 1; }
+mkdir -p -- "$(dirname -- "$OUT")"
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+W=300; H=224
+# 1) Dragon as an alpha mask (white shape, transparent background), padded so glitches have room
+convert "$SRC" -resize ${W}x${H} -background none -gravity center -extent $((W+40))x$((H+20)) -alpha copy -fill white -colorize 100 "$T/mask.png"
+# 2) Neon gradient fill (cyan -> blue -> purple), clipped to the dragon
+convert -size $((W+40))x$((H+20)) gradient:'#7dcfff'-'#bb9af7' -rotate 90 -resize $((W+40))x$((H+20))\! "$T/grad.png"
+convert "$T/grad.png" "$T/mask.png" -compose CopyOpacity -composite "$T/neon.png"
+# 3) Glow: blurred copy underneath
+convert "$T/neon.png" \( +clone -blur 0x6 -channel A -evaluate multiply 0.9 +channel \) +swap -compose over -composite "$T/base.png"
+# 4) Glitch frames
+rgbsplit() { # chromatic aberration: red copy left, cyan copy right, dragon on top; $1 = offset px, $2 = out
+  convert \( "$T/base.png" -fill '#ff2a6d' -colorize 100 -roll -${1}+0 \) \
+          \( "$T/base.png" -fill '#05d9e8' -colorize 100 -roll +${1}+0 \) \
+          -compose plus -composite "$T/base.png" -compose over -composite "$2"
+}
+slice() { # displace a few horizontal bands; $1 = in, $2 = seed, $3 = out
+  local h=$((H+20)) args=() y bh dx
+  RANDOM=$2
+  for i in 1 2 3; do
+    y=$((RANDOM % (h-20))); bh=$((4 + RANDOM % 14)); dx=$(( (RANDOM % 2 ? 1 : -1) * (6 + RANDOM % 18) ))
+    args+=( \( "$1" -crop $((W+40))x${bh}+0+${y} +repage -roll $(printf %+d "$dx")+0 \) -geometry +0+${y} -composite )
+  done
+  convert "$1" "${args[@]}" "$3"
+}
+rgbsplit 4 "$T/g1.png"; slice "$T/g1.png" 7 "$T/g1s.png"
+rgbsplit 8 "$T/g2.png"; slice "$T/g2.png" 42 "$T/g2s.png"
+rgbsplit 3 "$T/g3.png"; slice "$T/base.png" 99 "$T/g3s.png"
+# 5) Assemble: mostly still, with a quick glitch burst (delays in 1/100 s)
+# GIF has no partial transparency, so draw on the terminal's background colour (kitty.conf) instead
+BG=${FETCH_LOGO_BG:-#1a1b26}
+for f in "$T"/base.png "$T"/g*.png; do convert "$f" -background "$BG" -alpha remove -alpha off "$f"; done
+convert -dispose none \
+  -delay 260 "$T/base.png" \
+  -delay 6 "$T/g1s.png" -delay 4 "$T/base.png" -delay 7 "$T/g2s.png" -delay 5 "$T/g3s.png" \
+  -delay 90 "$T/base.png" \
+  -delay 5 "$T/g3.png" -delay 6 "$T/g1.png" \
+  -loop 0 -layers optimize "$OUT"
+echo "fetch-logo: wrote $OUT"

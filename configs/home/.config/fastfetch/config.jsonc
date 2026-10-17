@@ -1,0 +1,26 @@
+// fastfetch config used by `fetch` (the logo is drawn separately, animated, by kitten icat).
+// Keys are space-padded: "key.width" uses absolute cursor positioning, which would draw over the logo.
+{
+  "logo": { "type": "none" },
+  "display": {
+    "separator": "  ",
+    "color": { "keys": "magenta", "title": "cyan" }
+  },
+  "modules": [
+    "title",
+    "separator",
+    { "type": "os",       "key": "os    " },
+    { "type": "kernel",   "key": "kernel" },
+    { "type": "uptime",   "key": "uptime" },
+    { "type": "packages", "key": "pkgs  " },
+    { "type": "shell",    "key": "shell " },
+    { "type": "terminal", "key": "term  " },
+    { "type": "wm",       "key": "wm    " },
+    { "type": "cpu",      "key": "cpu   ", "showPeCoreCount": false },
+    { "type": "memory",   "key": "mem   " },
+    { "type": "disk",     "key": "disk  ", "folders": "/" },
+    { "type": "localip",  "key": "ip    ", "showIpv4": true, "showIpv6": false, "showPrefixLen": false },
+    "break",
+    "colors"
+  ]
+}
