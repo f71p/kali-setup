@@ -1,0 +1,35 @@
+---
+# User the machine is being set up for (playbook runs as this user, escalates per-task).
+target_user: "{{ ansible_user_id }}"
+target_home: "{{ ansible_env.HOME }}"
+
+packages_dir: "{{ playbook_dir }}/packages"
+configs_dir: "{{ playbook_dir }}/configs"
+
+# Where tools from packages/git-repos.txt are cloned.
+git_repos_dir: "{{ target_home }}/tools"
+
+# Keyboard layout (xkb name): gb = UK, us = US.
+keyboard_layout: gb
+
+# Installed versions of packages/github-releases.txt tools are recorded here.
+github_releases_state_dir: "{{ target_home }}/.local/state/github-releases"
+
+# Parallel rustc jobs for cargo builds. Rust compiles are RAM-hungry; keep low on small VMs.
+cargo_build_jobs: 1
+
+# Extra apt repositories, for packages Kali doesn't ship (added before packages/apt.txt is installed).
+apt_repositories:
+  - name: github-cli
+    uri: https://cli.github.com/packages
+    suite: stable
+    components: main
+    key: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+
+# Lists are read from packages/*.txt: one entry per line, '#' starts a comment.
+apt_packages: "{{ lookup('file', packages_dir ~ '/apt.txt').splitlines() | map('regex_replace', '#.*$', '') | map('trim') | select | list }}"
+pipx_packages: "{{ lookup('file', packages_dir ~ '/pipx.txt').splitlines() | map('regex_replace', '#.*$', '') | map('trim') | select | list }}"
+cargo_packages: "{{ lookup('file', packages_dir ~ '/cargo.txt').splitlines() | map('regex_replace', '#.*$', '') | map('trim') | select | list }}"
+go_packages: "{{ lookup('file', packages_dir ~ '/go.txt').splitlines() | map('regex_replace', '#.*$', '') | map('trim') | select | list }}"
+github_releases: "{{ lookup('file', packages_dir ~ '/github-releases.txt').splitlines() | map('regex_replace', '#.*$', '') | map('trim') | select | list }}"
+git_repos: "{{ lookup('file', packages_dir ~ '/git-repos.txt').splitlines() | map('regex_replace', '#.*$', '') | map('trim') | select | list }}"

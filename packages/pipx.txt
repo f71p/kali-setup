@@ -1,0 +1,8 @@
+# Python tools installed with pipx — one per line: <name> [source]
+# Prefer pipx over apt for Python tools: newer versions, isolated venvs.
+# source is optional: a PyPI spec or git+https URL, for tools not on PyPI under their name.
+# Tools are upgraded to the latest version on every run.
+
+netexec git+https://github.com/Pennyw0rth/NetExec
+man-spider
+smbclientng

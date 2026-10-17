@@ -1,0 +1,8 @@
+---
+- name: Install/upgrade cargo packages
+  community.general.cargo:
+    name: "{{ item }}"
+    state: latest
+  environment:
+    CARGO_BUILD_JOBS: "{{ cargo_build_jobs }}"
+  loop: "{{ cargo_packages }}"

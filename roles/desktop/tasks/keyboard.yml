@@ -1,0 +1,24 @@
+---
+# Keyboard layout. XFCE has no layout of its own here, so it follows the system setting.
+# VMware passes physical key positions through, so this must match the host's keyboard.
+
+- name: Set system keyboard layout (login screen, consoles, new sessions)
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/default/keyboard
+    regexp: '^XKBLAYOUT='
+    line: 'XKBLAYOUT="{{ keyboard_layout }}"'
+
+- name: Check current session layout
+  ansible.builtin.command: setxkbmap -query
+  register: xkb_query
+  changed_when: false
+  failed_when: false
+  when: ansible_env.DISPLAY is defined
+
+- name: Switch the current session layout now
+  ansible.builtin.command: setxkbmap {{ keyboard_layout }}
+  when:
+    - ansible_env.DISPLAY is defined
+    - xkb_query.stdout is defined
+    - xkb_query.stdout is not search('layout:\s+' ~ keyboard_layout ~ '$', multiline=True)

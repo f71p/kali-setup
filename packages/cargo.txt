@@ -1,0 +1,3 @@
+# Rust tools installed with `cargo install` — crates.io name, one per line.
+# Tools are upgraded to the latest version on every run.
+# Compiling needs a lot of RAM: prefer github-releases.txt when the tool publishes binaries.

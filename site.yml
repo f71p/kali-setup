@@ -1,0 +1,15 @@
+---
+- name: Set up Kali workstation
+  hosts: localhost
+  gather_facts: true
+
+  roles:
+    - { role: apt, tags: [apt] }
+    - { role: pipx, tags: [pipx] }
+    - { role: go, tags: [go] }
+    - { role: cargo, tags: [cargo] }
+    - { role: github_releases, tags: [releases] }
+    - { role: git_repos, tags: [git] }
+    - { role: dotfiles, tags: [dotfiles] }
+    - { role: wordlists, tags: [wordlists] }
+    - { role: desktop, tags: [desktop] }

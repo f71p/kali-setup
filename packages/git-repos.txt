@@ -1,0 +1,9 @@
+# Git repos — one per line: <url> [dest]
+# dest is optional (~ allowed); default is git_repos_dir (~/tools)/<repo name>.
+# e.g. https://github.com/swisskyrepo/PayloadsAllTheThings.git
+
+# zsh plugins
+https://github.com/Aloxaf/fzf-tab.git ~/.zsh/plugins/fzf-tab
+
+# Reference
+https://github.com/swisskyrepo/PayloadsAllTheThings.git

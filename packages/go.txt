@@ -1,0 +1,2 @@
+# Go tools installed with `go install` — full module path, '@latest' added if no version given.
+# e.g. github.com/projectdiscovery/httpx/cmd/httpx

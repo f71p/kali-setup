@@ -1,0 +1,41 @@
+---
+# configs/home/   mirrors $HOME  (copied as the user)
+# configs/system/ mirrors /      (copied as root)
+# Existing files are backed up with a timestamp suffix before being overwritten.
+
+# No mode on directories: create missing ones, never change permissions of existing ones.
+- name: Create home directories
+  ansible.builtin.file:
+    path: "{{ target_home }}/{{ item.path }}"
+    state: directory
+  loop: "{{ lookup('community.general.filetree', configs_dir ~ '/home', wantlist=True) | selectattr('state', 'eq', 'directory') | list }}"
+  loop_control: { label: "{{ item.path }}" }
+
+- name: Copy home config files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ target_home }}/{{ item.path }}"
+    mode: "{{ item.mode }}"
+    backup: true
+  loop: "{{ lookup('community.general.filetree', configs_dir ~ '/home', wantlist=True) | selectattr('state', 'eq', 'file') | rejectattr('path', 'search', '\\.gitkeep$') | list }}"
+  loop_control: { label: "{{ item.path }}" }
+
+- name: Create system directories
+  become: true
+  ansible.builtin.file:
+    path: "/{{ item.path }}"
+    state: directory
+  loop: "{{ lookup('community.general.filetree', configs_dir ~ '/system', wantlist=True) | selectattr('state', 'eq', 'directory') | list }}"
+  loop_control: { label: "/{{ item.path }}" }
+
+- name: Copy system config files
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "/{{ item.path }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+    backup: true
+  loop: "{{ lookup('community.general.filetree', configs_dir ~ '/system', wantlist=True) | selectattr('state', 'eq', 'file') | rejectattr('path', 'search', '\\.gitkeep$') | list }}"
+  loop_control: { label: "/{{ item.path }}" }

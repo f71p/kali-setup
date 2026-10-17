@@ -1,0 +1,7 @@
+---
+- name: Decompress rockyou.txt (keeps the .gz that the wordlists package owns)
+  become: true
+  ansible.builtin.command:
+    cmd: gunzip -k /usr/share/wordlists/rockyou.txt.gz
+    creates: /usr/share/wordlists/rockyou.txt
+    removes: /usr/share/wordlists/rockyou.txt.gz

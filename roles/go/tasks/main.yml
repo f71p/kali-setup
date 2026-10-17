@@ -1,0 +1,8 @@
+---
+- name: Install Go tools
+  ansible.builtin.command:
+    cmd: "go install {{ item if '@' in item else item ~ '@latest' }}"
+    creates: "{{ target_home }}/go/bin/{{ (item.split('@') | first).split('/') | last }}"
+  environment:
+    GOPATH: "{{ target_home }}/go"
+  loop: "{{ go_packages }}"

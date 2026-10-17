@@ -1,0 +1,69 @@
+---
+- name: "{{ gh_repo }}: look up latest release"
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/{{ gh_repo }}/releases/latest"
+    headers: { Accept: application/vnd.github+json }
+  register: gh_release
+
+- name: "{{ gh_repo }}: pick asset"
+  ansible.builtin.set_fact:
+    gh_asset: "{{ gh_release.json.assets | selectattr('name', 'search', gh_pattern) | first }}"
+    gh_tag: "{{ gh_release.json.tag_name }}"
+    gh_state_file: "{{ github_releases_state_dir }}/{{ gh_repo | replace('/', '__') }}"
+
+- name: "{{ gh_repo }}: read installed version"
+  ansible.builtin.slurp:
+    src: "{{ gh_state_file }}"
+  register: gh_installed
+  failed_when: false
+
+- name: "{{ gh_repo }}: install {{ gh_tag }}"
+  when: >-
+    gh_installed.content is not defined
+    or (gh_installed.content | b64decode | trim) != gh_tag
+    or not (target_home ~ '/.local/bin/' ~ gh_binary) is file
+  block:
+    - name: "{{ gh_repo }}: create temp dir"
+      ansible.builtin.tempfile:
+        state: directory
+      register: gh_tmp
+
+    - name: "{{ gh_repo }}: download {{ gh_asset.name }}"
+      ansible.builtin.get_url:
+        url: "{{ gh_asset.browser_download_url }}"
+        dest: "{{ gh_tmp.path }}/{{ gh_asset.name }}"
+        checksum: "{{ gh_asset.digest | default(omit, true) }}"
+        mode: "0644"
+
+    - name: "{{ gh_repo }}: unpack"
+      ansible.builtin.unarchive:
+        src: "{{ gh_tmp.path }}/{{ gh_asset.name }}"
+        dest: "{{ gh_tmp.path }}"
+      when: gh_asset.name is search('\.(tar\.gz|tgz|tar\.xz|zip)$')
+
+    - name: "{{ gh_repo }}: find binary"
+      ansible.builtin.find:
+        paths: "{{ gh_tmp.path }}"
+        patterns: "{{ gh_binary if gh_asset.name is search('\\.(tar\\.gz|tgz|tar\\.xz|zip)$') else gh_asset.name }}"
+        recurse: true
+      register: gh_found
+      failed_when: gh_found.matched != 1
+
+    - name: "{{ gh_repo }}: install to ~/.local/bin/{{ gh_binary }}"
+      ansible.builtin.copy:
+        src: "{{ gh_found.files[0].path }}"
+        dest: "{{ target_home }}/.local/bin/{{ gh_binary }}"
+        mode: "0755"
+
+    - name: "{{ gh_repo }}: record installed version"
+      ansible.builtin.copy:
+        content: "{{ gh_tag }}\n"
+        dest: "{{ gh_state_file }}"
+        mode: "0644"
+
+  always:
+    - name: "{{ gh_repo }}: remove temp dir"
+      ansible.builtin.file:
+        path: "{{ gh_tmp.path }}"
+        state: absent
+      when: gh_tmp.path is defined

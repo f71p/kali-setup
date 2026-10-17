@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# extract <archive>... — unpack any common archive into a folder named after it.
+# Detects the type by extension, falling back to `file` for misnamed downloads.
+set -euo pipefail
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"; exit 0
+fi
+
+die() { echo "extract: $*" >&2; exit 1; }
+[ $# -gt 0 ] || { echo "usage: extract <archive>..." >&2; exit 1; }
+
+# Print the archive type for a file: by extension first, then by content.
+kind() {
+    local f=${1,,}
+    case $f in
+        *.tar.gz|*.tgz)     echo tar.gz ;;
+        *.tar.bz2|*.tbz2|*.tbz) echo tar.bz2 ;;
+        *.tar.xz|*.txz)     echo tar.xz ;;
+        *.tar.zst|*.tzst)   echo tar.zst ;;
+        *.tar.lz4)          echo tar.lz4 ;;
+        *.tar)              echo tar ;;
+        *.zip|*.jar|*.war|*.apk|*.docx|*.xlsx|*.pptx) echo zip ;;
+        *.7z)               echo 7z ;;
+        *.rar)              echo rar ;;
+        *.gz)               echo gz ;;
+        *.bz2)              echo bz2 ;;
+        *.xz)               echo xz ;;
+        *.zst)              echo zst ;;
+        *.lz4)              echo lz4 ;;
+        *.deb)              echo deb ;;
+        *.rpm)              echo rpm ;;
+        *.cab)              echo cab ;;
+        *.iso)              echo 7z ;;
+        *)
+            case $(file -b --mime-type -- "$1") in
+                application/zip|application/java-archive) echo zip ;;
+                application/x-7z-compressed)  echo 7z ;;
+                application/vnd.rar|application/x-rar) echo rar ;;
+                application/x-tar)            echo tar ;;
+                application/gzip)             echo gz ;;
+                application/x-bzip2)          echo bz2 ;;
+                application/x-xz)             echo xz ;;
+                application/zstd)             echo zst ;;
+                application/vnd.debian.binary-package) echo deb ;;
+                application/x-rpm)            echo rpm ;;
+                application/vnd.ms-cab-compressed) echo cab ;;
+                application/x-iso9660-image)  echo 7z ;;
+                *) echo unknown ;;
+            esac ;;
+    esac
+}
+
+# Folder name: archive name without its archive extension(s).
+stem() {
+    local b
+    b=$(basename -- "$1")
+    local s
+    s=$(sed -E 's/\.(tar\.(gz|bz2|xz|zst|lz4)|tgz|tbz2?|txz|tzst|tar|zip|jar|war|apk|7z|rar|gz|bz2|xz|zst|lz4|deb|rpm|cab|iso)$//I' <<<"$b")
+    [ "$s" != "$b" ] || s=${b%.*}    # unrecognised extension (detected by content): drop it
+    echo "${s:-extracted}"
+}
+
+for f in "$@"; do
+    [ -f "$f" ] || die "not a file: $f"
+    src=$(realpath -- "$f")
+    t=$(kind "$f")
+    [ "$t" != unknown ] || die "unknown archive type: $f ($(file -b -- "$f"))"
+
+    # Single compressed files (not tarballs) decompress next to the original.
+    case $t in
+        gz)  gzip  -dk -- "$f"; echo "extracted $f"; continue ;;
+        bz2) bzip2 -dk -- "$f"; echo "extracted $f"; continue ;;
+        xz)  xz    -dk -- "$f"; echo "extracted $f"; continue ;;
+        zst) zstd  -dk -- "$f"; echo "extracted $f"; continue ;;
+        lz4) lz4   -dk -- "$f"; echo "extracted $f"; continue ;;
+    esac
+
+    out=$(stem "$f")
+    if [ -e "$out" ]; then n=1; while [ -e "$out-$n" ]; do n=$((n+1)); done; out="$out-$n"; fi
+    mkdir -p -- "$out"
+
+    case $t in
+        tar|tar.*) tar -xf "$src" -C "$out" ;;
+        zip)       unzip -q "$src" -d "$out" ;;
+        7z)        7z x -bd -o"$out" "$src" >/dev/null ;;
+        rar)       unrar x -idq "$src" "$out/" ;;
+        deb)       (cd "$out" && ar x "$src") ;;
+        rpm)       (cd "$out" && rpm2cpio "$src" | cpio -idm --quiet) ;;
+        cab)       cabextract -q -d "$out" "$src" ;;
+    esac
+    echo "extracted $f -> $out/"
+done

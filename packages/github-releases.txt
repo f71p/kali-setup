@@ -1,0 +1,6 @@
+# Prebuilt binaries from GitHub releases — one per line: <owner/repo> <asset regex> [binary name]
+# Installs the latest release into ~/.local/bin, verifying the SHA-256 GitHub publishes for the asset.
+# binary name defaults to the repo name, lowercased. Archives (.tar.gz/.tgz/.tar.xz/.zip) are unpacked.
+# Prefer this over cargo for Rust tools: no compiling (which needs a lot of RAM).
+
+g0h4n/RustHound-CE rusthound-ce-Linux-gnu-x86_64\.tar\.gz$

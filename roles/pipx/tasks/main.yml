@@ -1,0 +1,7 @@
+---
+- name: Install/upgrade pipx packages
+  community.general.pipx:
+    name: "{{ item.split()[0] }}"
+    source: "{{ item.split()[1] if item.split() | length > 1 else omit }}"
+    state: latest
+  loop: "{{ pipx_packages }}"
