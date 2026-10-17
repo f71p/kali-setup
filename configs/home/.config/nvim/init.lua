@@ -23,9 +23,8 @@ o.smartcase = true
 o.mouse = "a"
 o.clipboard = "unnamedplus"   -- share the system clipboard
 
--- Copy via OSC 52: the terminal (kitty) sets the clipboard, offering the formats VMware's
--- host clipboard sync needs (xclip only offers UTF8_STRING, which never reaches the host).
--- Works through tmux (set-clipboard on) and over SSH. Paste still reads the X clipboard.
+-- Copy via OSC 52: the terminal (kitty) sets the clipboard, so copying works through tmux
+-- (set-clipboard on) and over SSH. Paste still reads the X clipboard.
 local osc52 = require("vim.ui.clipboard.osc52")
 vim.g.clipboard = {
   name = "osc52-copy",
