@@ -36,7 +36,7 @@ Once ansible is installed, `ansible-playbook site.yml -K [--tags ...]` does the 
 | `dotfiles` | Copies `configs/` into place |
 | `wordlists` | Unzips rockyou (sudo) |
 | `desktop` | Disables XFCE screen lock/blanking; sets keyboard layout and timezone (`keyboard_layout`, `timezone`, sudo) |
-| `vmware` | VMware guests only: what `kali-tweaks` → Virtualization does (`mount-shared-folders`, plus our own `restart-vm-tools` that fixes copy/paste), plus a boot service that mounts shared folders under `/mnt/hgfs` (sudo) |
+| `vmware` | VMware guests only: what `kali-tweaks` → Virtualization does (`mount-shared-folders`, plus our own `restart-vm-tools` that fixes copy/paste), `autocutsel` so terminal copies reach Windows, plus a boot service that mounts shared folders under `/mnt/hgfs` (sudo) |
 
 After editing a config in `configs/`, apply it with `./bootstrap.sh --tags dotfiles`.
 
@@ -58,6 +58,26 @@ Installed to `~/.local/bin` from `configs/home/.local/bin/`. Each one prints its
 | `y` | Opens the yazi file manager (vim keys, `z` fuzzy find, image previews); quitting `cd`s you to where you were |
 
 `$LOGS` (`~/logs`) is the central place for recordings and tool output, e.g. `nmap -oA $LOGS/scan`.
+
+## Copy/paste to the Windows host (VMware)
+
+When you switch to Windows, VMware Tools sends whichever of Kali's two copy buffers, the
+clipboard or the highlighted text (PRIMARY), was set most recently. It asks each one's owner for
+a `TIMESTAMP`. kitty doesn't answer that for the clipboard, so VMware always sent the last
+*highlight*: Shift+drag reached Windows, but `Ctrl+Shift+Y`, tmux copies and `clip` didn't.
+(Source: `copyPasteUIX11.cpp` in open-vm-tools.)
+
+The `vmware` tag fixes this with **autocutsel**, which keeps the clipboard and the highlight
+in step (started at login from `~/.config/autostart/autocutsel.desktop`). Side effect:
+highlighting text in any app also replaces the clipboard.
+
+If copying to Windows breaks:
+
+1. Check autocutsel is running: `pgrep -a autocutsel` should list two. If not:
+   `autocutsel -fork; autocutsel -selection PRIMARY -fork`
+2. `restart-vm-tools` (with or without sudo) restarts VMware Tools, keeping the clipboard part
+   running as you. Don't use kali-tweaks' version: it starts it as root, which breaks copy/paste.
+3. Still stuck: reopen kitty/tmux, then suspend and resume the VM.
 
 ## Layout
 

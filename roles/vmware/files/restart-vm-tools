@@ -6,7 +6,7 @@ if [ "$(id -u)" -eq 0 ]; then
     [ -n "${SUDO_USER:-}" ] || { echo "restart-vm-tools: run it as your user, not as root" >&2; exit 1; }
     exec sudo -u "$SUDO_USER" "$0"                  # the clipboard part must run as you
 fi
-sudo systemctl restart open-vm-tools                # system half
-pkill -u "$(id -u)" -x vmtoolsd                     # clipboard half: stop it...
-sleep 1
-vmware-user-suid-wrapper 2>/dev/null                # ...and start it again as you
+sudo systemctl stop open-vm-tools
+sudo killall -q -w vmtoolsd                         # every copy, including a clipboard one left running as root
+sudo systemctl start open-vm-tools                  # system half
+vmware-user-suid-wrapper 2>/dev/null                # clipboard half, as you

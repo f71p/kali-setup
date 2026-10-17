@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=autocutsel
+Comment=Keep the clipboard and the highlighted text in step, so copies from kitty/tmux reach the VMware host
+Exec=sh -c "autocutsel -fork; autocutsel -selection PRIMARY -fork"
+X-GNOME-Autostart-enabled=true
