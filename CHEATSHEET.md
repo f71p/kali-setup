@@ -49,7 +49,7 @@ All support `-h`.
 | `Tab` | Fuzzy completion menu (type to filter, `<` `>` switch groups) |
 | `cmd -` then `Tab` | Flags for any tool, read from its `--help` |
 | `Ctrl+R` | Fuzzy search command history |
-| `Ctrl+T` | Insert a file path (fuzzy, with a preview) |
+| `Ctrl+T` / `Ctrl+F` | Insert a file path (fuzzy, with a preview), e.g. `cat ` then `Ctrl+F`. `Tab` marks several |
 | `Alt+C` | cd into a folder (fuzzy) |
 | `z <part>` | Jump to a frequently used folder (`z setup` → `~/Projects/setup`) |
 | `zi` | Pick a frequent folder from a list |

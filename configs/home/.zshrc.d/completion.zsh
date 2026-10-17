@@ -20,4 +20,5 @@ fi
 # fzf key bindings: ctrl+R history, ctrl+T files, alt+C cd (loaded after fzf-tab so tab falls through to it)
 if command -v fzf >/dev/null; then
     source <(fzf --zsh)
+    bindkey '^F' fzf-file-widget    # ctrl+F: same file picker as ctrl+T
 fi
