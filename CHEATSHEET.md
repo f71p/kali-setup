@@ -10,7 +10,6 @@ In tmux, **prefix** means `Ctrl+A` (press, release, then the next key).
 - [Neovim](#neovim)
 - [yazi](#yazi)
 - [Desktop (XFCE) and VMware](#desktop-xfce-and-vmware)
-- [Pentest tools](#pentest-tools)
 - [This playbook](#this-playbook)
 
 ---
@@ -28,7 +27,7 @@ All support `-h`.
 | `y` | Opens yazi (file manager). Quitting with `q` leaves you in the folder you were in |
 | `history -i 1` | Every command with date/time (`history -i -20` for the last 20) |
 
-`$LOGS` = `~/logs`: put tool output there too, e.g. `nmap -oA $LOGS/scan <target>`.
+`$LOGS` = `~/logs`: a central place for recordings and anything else you want to keep, e.g. `cmd > $LOGS/out.txt`.
 
 ---
 
@@ -253,69 +252,6 @@ Images and PDFs preview in the right pane, including inside tmux.
 | `ls /mnt/hgfs/` | Shared folders (mounted automatically at boot) |
 | `sudo mount-shared-folders` | Mount shares added while the VM is running |
 | `sudo restart-vm-tools` | Fix copy/paste or resizing when VMware Tools misbehaves |
-
----
-
-## Pentest tools
-
-Placeholders: `TARGET`, `USER`, `PASS`, `DOMAIN`, `DC` (domain controller). Only use against systems you're authorised to test.
-
-**NetExec** (`nxc`): protocols `smb winrm ldap mssql ssh rdp ftp wmi vnc nfs`
-
-| Command | Does |
-|---|---|
-| `nxc smb TARGET` | Host info (OS, domain, signing) |
-| `nxc smb TARGET -u USER -p PASS` | Check credentials (`-H HASH` for a hash, `--local-auth` for local accounts) |
-| `nxc smb TARGET -u USER -p PASS --shares` | List shares and access |
-| `nxc smb TARGET -u USER -p PASS --users` | List domain users |
-| `nxc ldap DC -u USER -p PASS -k` | Kerberos authentication |
-
-Results are saved in `~/.nxc/` (workspaces, logs).
-
-**smbclient-ng**: interactive SMB shell
-
-`smbclientng -H TARGET -d DOMAIN -u USER -p PASS`, then `shares`, `use SHARE`, `ls`, `cd`, `get`, `put`, `help`.
-
-**MANSPIDER**: find files on SMB shares by name, extension or content
-
-`manspider TARGET -d DOMAIN -u USER -p PASS -e xlsx docx txt -c 'passw' -l $LOGS/loot`
-(`-f REGEX` for file names, `-H HASH` instead of a password)
-
-**RustHound-CE**: collect AD data for BloodHound CE
-
-`rusthound-ce -d DOMAIN -u USER@DOMAIN -p PASS -i DC_IP -o $LOGS/bh -z`
-(`--ldaps` for LDAPS, `-k` for Kerberos via `KRB5CCNAME`). Import the zip into BloodHound CE.
-
-**testssl**: TLS/SSL configuration check
-
-| Command | Does |
-|---|---|
-| `testssl TARGET:443` | Full check |
-| `testssl -p -S TARGET` | Protocols and certificate only |
-| `testssl -U TARGET` | Known vulnerabilities only |
-| `testssl --htmlfile $LOGS/ TARGET` | Also save an HTML report |
-
-**ffuf**: web fuzzing (`FUZZ` marks where words go)
-
-| Command | Does |
-|---|---|
-| `ffuf -u http://TARGET/FUZZ -w WORDLIST` | Find paths |
-| `… -e .php,.txt` | Also try extensions |
-| `… -fc 404` / `-fs 1234` | Hide a status code / a response size |
-| `… -mc all` | Show every status code |
-| `ffuf -u http://TARGET -H 'Host: FUZZ.TARGET' -w WORDLIST -fs SIZE` | Find virtual hosts |
-| `… -o $LOGS/ffuf.json` | Save results |
-
-**Wordlists and references**
-
-| Path | What |
-|---|---|
-| `/usr/share/wordlists/rockyou.txt` | Passwords |
-| `/usr/share/seclists/Discovery/Web-Content/` | Web paths (e.g. `common.txt`, `raft-medium-directories.txt`) |
-| `/usr/share/seclists/Discovery/DNS/` | Subdomains |
-| `/usr/share/seclists/Usernames/` · `Passwords/` | Usernames, passwords |
-| `/usr/share/peass/linpeas/` · `winpeas/` | linPEAS / winPEAS scripts and binaries |
-| `~/tools/PayloadsAllTheThings/` | Payload and technique reference (search it with `y` → `S`) |
 
 ---
 
