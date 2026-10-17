@@ -52,6 +52,7 @@ All support `-h`.
 | `Ctrl+R` | Fuzzy search command history |
 | `Ctrl+T` / `Ctrl+F` | Insert a file path (fuzzy, with a preview, images too), e.g. `cat ` then `Ctrl+F`. `Tab` marks several |
 | `Alt+C` | cd into a folder (fuzzy) |
+| `Esc` `Esc` | Put `sudo` in front of the command (the last one if the line is empty); again to remove it |
 | `z <part>` | Jump to a frequently used folder (`z setup` → `~/Projects/setup`) |
 | `zi` | Pick a frequent folder from a list |
 
