@@ -18,6 +18,16 @@
     mode: "0755"
   loop: [mount-shared-folders, restart-vm-tools]
 
+# This machine's sudo searches only /usr/sbin:/usr/bin:/sbin:/bin, so `sudo restart-vm-tools` fails.
+# Restore Debian's usual path (adds /usr/local). Checked with visudo first: a bad file would break sudo.
+- name: Let sudo find commands in /usr/local
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/secure-path
+    content: 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'
+    mode: "0440"
+    validate: visudo -cf %s
+
 - name: Install boot-time shared folder mount service
   become: true
   ansible.builtin.copy:
