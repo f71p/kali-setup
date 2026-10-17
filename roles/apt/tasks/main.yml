@@ -36,3 +36,10 @@
     name: "{{ apt_packages }}"
     state: present
   when: apt_packages | length > 0
+
+- name: Link fd to fdfind (Debian's name for fd; tools like yazi look for fd)
+  ansible.builtin.file:
+    src: /usr/bin/fdfind
+    dest: "{{ target_home }}/.local/bin/fd"
+    state: link
+  when: "'fd-find' in apt_packages"

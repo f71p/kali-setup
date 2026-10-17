@@ -13,7 +13,7 @@
   vars:
     gh_repo: "{{ release_line.split()[0] }}"
     gh_pattern: "{{ release_line.split()[1] }}"
-    gh_binary: "{{ release_line.split()[2] if release_line.split() | length > 2 else gh_repo.split('/')[1] | lower }}"
+    gh_binaries: "{{ (release_line.split()[2] if release_line.split() | length > 2 else gh_repo.split('/')[1] | lower).split(',') }}"
   loop: "{{ github_releases }}"
   loop_control:
     loop_var: release_line

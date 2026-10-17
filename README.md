@@ -49,6 +49,7 @@ Installed to `~/.local/bin` from `configs/home/.local/bin/`. Each one prints its
 | `rec [label]` | Records the terminal (output only) to `$LOGS/<date>/` until `exit`; tmux shows ● REC |
 | `logcat <log>` | Shows a `rec` log as plain text; replay with `scriptreplay -T <file>.timing <file>.log` |
 | `tmux-netinfo` | tmux status bar: tun0 IP when the VPN is up, else eth0 |
+| `y` | Opens the yazi file manager (vim keys, `z` fuzzy find, image previews); quitting `cd`s you to where you were |
 
 `$LOGS` (`~/logs`) is the central place for recordings and tool output, e.g. `nmap -oA $LOGS/scan`.
 

@@ -10,6 +10,7 @@
     gh_asset: "{{ gh_release.json.assets | selectattr('name', 'search', gh_pattern) | first }}"
     gh_tag: "{{ gh_release.json.tag_name }}"
     gh_state_file: "{{ github_releases_state_dir }}/{{ gh_repo | replace('/', '__') }}"
+    gh_archive: "{{ (gh_release.json.assets | selectattr('name', 'search', gh_pattern) | first).name is search('\\.(tar\\.gz|tgz|tar\\.xz|zip)$') }}"
 
 - name: "{{ gh_repo }}: read installed version"
   ansible.builtin.slurp:
@@ -21,7 +22,7 @@
   when: >-
     gh_installed.content is not defined
     or (gh_installed.content | b64decode | trim) != gh_tag
-    or not (target_home ~ '/.local/bin/' ~ gh_binary) is file
+    or gh_binaries | map('regex_replace', '^', target_home ~ '/.local/bin/') | reject('file') | list | length > 0
   block:
     - name: "{{ gh_repo }}: create temp dir"
       ansible.builtin.tempfile:
@@ -39,21 +40,23 @@
       ansible.builtin.unarchive:
         src: "{{ gh_tmp.path }}/{{ gh_asset.name }}"
         dest: "{{ gh_tmp.path }}"
-      when: gh_asset.name is search('\.(tar\.gz|tgz|tar\.xz|zip)$')
+      when: gh_archive
 
-    - name: "{{ gh_repo }}: find binary"
+    - name: "{{ gh_repo }}: find {{ gh_binaries | join(', ') }}"
       ansible.builtin.find:
         paths: "{{ gh_tmp.path }}"
-        patterns: "{{ gh_binary if gh_asset.name is search('\\.(tar\\.gz|tgz|tar\\.xz|zip)$') else gh_asset.name }}"
+        patterns: "{{ gh_binaries if gh_archive else [gh_asset.name] }}"
         recurse: true
       register: gh_found
-      failed_when: gh_found.matched != 1
+      failed_when: gh_found.matched != (gh_binaries | length if gh_archive else 1)
 
-    - name: "{{ gh_repo }}: install to ~/.local/bin/{{ gh_binary }}"
+    - name: "{{ gh_repo }}: install to ~/.local/bin"
       ansible.builtin.copy:
-        src: "{{ gh_found.files[0].path }}"
-        dest: "{{ target_home }}/.local/bin/{{ gh_binary }}"
+        src: "{{ item.path }}"
+        dest: "{{ target_home }}/.local/bin/{{ item.path | basename if gh_archive else gh_binaries[0] }}"
         mode: "0755"
+      loop: "{{ gh_found.files }}"
+      loop_control: { label: "{{ item.path | basename }}" }
 
     - name: "{{ gh_repo }}: record installed version"
       ansible.builtin.copy:
