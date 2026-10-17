@@ -34,6 +34,7 @@ Once ansible is installed, `ansible-playbook site.yml -K [--tags ...]` does the 
 | `dotfiles` | Copies `configs/` into place |
 | `wordlists` | Unzips rockyou (sudo) |
 | `desktop` | Disables XFCE screen lock/blanking; sets keyboard layout (`keyboard_layout`, sudo) |
+| `vmware` | VMware guests only: what `kali-tweaks` → Virtualization does (`mount-shared-folders`, `restart-vm-tools`), plus a boot service that mounts shared folders under `/mnt/hgfs` (sudo) |
 
 After editing a config in `configs/`, apply it with `./bootstrap.sh --tags dotfiles`.
 

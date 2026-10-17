@@ -1,0 +1,35 @@
+---
+# What `kali-tweaks` -> Virtualization -> VMware does, plus mounting shared folders at boot.
+# kali-tweaks installs open-vm-tools-desktop and copies two helper scripts from its data
+# directory into /usr/local/sbin; we do the same, non-interactively.
+
+- name: Install VMware guest packages
+  become: true
+  ansible.builtin.apt:
+    name: [open-vm-tools-desktop, fuse3, kali-tweaks]
+    state: present
+
+- name: Install kali-tweaks VMware helpers (mount-shared-folders, restart-vm-tools)
+  become: true
+  ansible.builtin.copy:
+    src: "/usr/lib/kali_tweaks/data/{{ item }}"
+    dest: "/usr/local/sbin/{{ item }}"
+    remote_src: true
+    mode: "0755"
+  loop: [mount-shared-folders, restart-vm-tools]
+
+- name: Install boot-time shared folder mount service
+  become: true
+  ansible.builtin.copy:
+    src: mount-shared-folders.service
+    dest: /etc/systemd/system/mount-shared-folders.service
+    mode: "0644"
+  register: vmware_unit
+
+- name: Enable and start shared folder mounting
+  become: true
+  ansible.builtin.systemd_service:
+    name: mount-shared-folders.service
+    enabled: true
+    state: "{{ 'restarted' if vmware_unit is changed else 'started' }}"
+    daemon_reload: "{{ vmware_unit is changed }}"

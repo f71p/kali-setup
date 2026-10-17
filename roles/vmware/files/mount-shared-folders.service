@@ -1,0 +1,16 @@
+# Installed by the kali-setup playbook (roles/vmware).
+# Runs kali-tweaks' mount-shared-folders at boot: each VMware shared folder -> /mnt/hgfs/<name>.
+[Unit]
+Description=Mount VMware shared folders under /mnt/hgfs
+ConditionVirtualization=vmware
+Wants=open-vm-tools.service
+After=open-vm-tools.service local-fs.target
+
+[Service]
+Type=oneshot
+# Keep the unit active so the vmhgfs-fuse mount processes it starts stay running.
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/mount-shared-folders
+
+[Install]
+WantedBy=multi-user.target
