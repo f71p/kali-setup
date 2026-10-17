@@ -22,6 +22,11 @@ neovim
 xclip
 fonts-jetbrains-mono
 
+# yazi (file manager, from github-releases.txt) helpers:
+fd-find            # fast file search (Debian names it fdfind; linked to fd by the apt role)
+ripgrep            # fast content search
+jq                 # JSON previews
+
 # Tools:
 cabextract  # extract: .cab
 lz4         # extract: .lz4
