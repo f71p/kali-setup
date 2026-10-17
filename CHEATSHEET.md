@@ -64,6 +64,8 @@ All support `-h`.
 | `Ctrl+←` / `Ctrl+→` | Move by word |
 | `Ctrl+P` | Toggle Kali's one-line / two-line prompt |
 
+The time on the right of the prompt is when that command was run (Enter pressed), handy for reports.
+
 **Nicer everyday commands**
 
 | Command | Does |
