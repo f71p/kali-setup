@@ -14,11 +14,11 @@
   register: xkb_query
   changed_when: false
   failed_when: false
-  when: ansible_env.DISPLAY is defined
+  when: ansible_facts.env.DISPLAY is defined
 
 - name: Switch the current session layout now
   ansible.builtin.command: setxkbmap {{ keyboard_layout }}
   when:
-    - ansible_env.DISPLAY is defined
+    - ansible_facts.env.DISPLAY is defined
     - xkb_query.stdout is defined
     - xkb_query.stdout is not search('layout:\s+' ~ keyboard_layout ~ '$', multiline=True)
