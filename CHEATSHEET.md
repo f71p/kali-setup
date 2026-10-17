@@ -106,6 +106,7 @@ Start: `tmux` · reattach: `tmux a` · list sessions: `tmux ls`
 | prefix `d` | Detach (everything keeps running; `tmux a` to return) |
 | prefix `r` | Reload `~/.tmux.conf` |
 | prefix `y` | Copy the last command and its output (same as `Ctrl+Shift+Y`) |
+| prefix `,` | Rename the window. Otherwise tabs name themselves: the running program, or the folder when idle |
 | prefix `\` | Floating terminal over the current pane; prefix `\` again hides it (what runs in it keeps going) |
 | Mouse drag | Resize panes, select text (copies to clipboard on release) |
 
