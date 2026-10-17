@@ -20,6 +20,19 @@
   loop: "{{ lookup('community.general.filetree', configs_dir ~ '/home', wantlist=True) | selectattr('state', 'eq', 'file') | rejectattr('path', 'search', '\\.gitkeep$') | list }}"
   loop_control: { label: "{{ item.path }}" }
 
+- name: Install the cheat sheet for `keys`
+  block:
+    - name: Create the cheat sheet folder
+      ansible.builtin.file:
+        path: "{{ target_home }}/.local/share/kali-setup"
+        state: directory
+        mode: "0755"
+    - name: Copy CHEATSHEET.md
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/CHEATSHEET.md"
+        dest: "{{ target_home }}/.local/share/kali-setup/CHEATSHEET.md"
+        mode: "0644"
+
 - name: Keep only the newest {{ dotfiles_backups_kept }} backups of each home config file
   ansible.builtin.shell: |
     n=0
