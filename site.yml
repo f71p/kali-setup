@@ -13,3 +13,6 @@
     - { role: dotfiles, tags: [dotfiles] }
     - { role: wordlists, tags: [wordlists] }
     - { role: desktop, tags: [desktop] }
+    - role: vmware
+      tags: [vmware]
+      when: ansible_facts.virtualization_type == 'VMware'
