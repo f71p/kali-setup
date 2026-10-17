@@ -63,4 +63,4 @@
   args:
     creates: "{{ target_home }}/.local/share/fetch/logo.gif"
   register: fetch_logo
-  changed_when: fetch_logo.stdout != 'skipped'
+  changed_when: "'skipped' not in fetch_logo.stdout"   # also matches the creates: skip message

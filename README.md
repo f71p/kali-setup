@@ -68,7 +68,7 @@ Installed to `~/.local/bin` from `configs/home/.local/bin/`. Each one prints its
 | `packages/github-releases.txt` | Prebuilt binaries from GitHub releases → `~/.local/bin`, checksum-verified, kept at latest |
 | `packages/git-repos.txt` | Repos: `<url> [dest]`, default dest `~/tools/<name>` |
 | `configs/home/` | Mirrors `$HOME` — e.g. `configs/home/.tmux.conf` → `~/.tmux.conf` |
-| `configs/home/.zshrc.d/` | Personal zsh config. `.zshrc` itself is Kali's stock file plus one line that loads these |
+| `configs/home/.zshrc.d/` | Personal zsh config. `.zshrc` itself is Kali's stock file plus a line that loads these, and one at the end for `aliases` (overrides Kali's `ls` aliases) |
 | `configs/system/` | Mirrors `/` — e.g. `configs/system/etc/foo.conf` → `/etc/foo.conf` |
 | `roles/wordlists`, `roles/desktop` | Unzip rockyou; disable XFCE screen lock/blanking |
 | `roles/` | One role per module; tag name matches |

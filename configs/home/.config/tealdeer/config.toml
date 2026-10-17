@@ -1,0 +1,4 @@
+# tealdeer (`tldr`): download the pages on first use and refresh them monthly
+[updates]
+auto_update = true
+auto_update_interval_hours = 720
