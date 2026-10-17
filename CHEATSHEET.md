@@ -268,7 +268,7 @@ Images and PDFs preview in the right pane, including inside tmux.
 |---|---|
 | `ls /mnt/hgfs/` | Shared folders (mounted automatically at boot) |
 | `sudo mount-shared-folders` | Mount shares added while the VM is running |
-| `sudo restart-vm-tools` | Fix copy/paste or resizing when VMware Tools misbehaves |
+| `restart-vm-tools` | Fix copy/paste or resizing when VMware Tools misbehaves (then reopen kitty/tmux if the terminal still won't copy) |
 
 ---
 

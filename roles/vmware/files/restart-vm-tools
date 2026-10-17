@@ -1,0 +1,12 @@
+#!/bin/sh
+# restart-vm-tools — fix copy/paste (or resizing) when VMware Tools stops working.
+# Replaces kali-tweaks' version, which starts the clipboard part as root under sudo and breaks it.
+# Works with or without sudo. If the terminal still won't copy afterwards, reopen kitty/tmux.
+if [ "$(id -u)" -eq 0 ]; then
+    [ -n "${SUDO_USER:-}" ] || { echo "restart-vm-tools: run it as your user, not as root" >&2; exit 1; }
+    exec sudo -u "$SUDO_USER" "$0"                  # the clipboard part must run as you
+fi
+sudo systemctl restart open-vm-tools                # system half
+pkill -u "$(id -u)" -x vmtoolsd                     # clipboard half: stop it...
+sleep 1
+vmware-user-suid-wrapper 2>/dev/null                # ...and start it again as you
