@@ -7,7 +7,7 @@
 - name: Install VMware guest packages
   become: true
   ansible.builtin.apt:
-    name: [open-vm-tools-desktop, fuse3, kali-tweaks]
+    name: [open-vm-tools-desktop, fuse3, kali-tweaks, autocutsel]
     state: present
 
 - name: Install kali-tweaks' mount-shared-folders helper
@@ -34,6 +34,21 @@
     content: 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'
     mode: "0440"
     validate: visudo -cf %s
+
+# VMware sends the host whichever of CLIPBOARD and PRIMARY (highlighted text) is newer, judged by each
+# owner's TIMESTAMP. kitty doesn't answer TIMESTAMP for CLIPBOARD, so VMware always sends the last
+# highlight and copies from Ctrl+Shift+Y / tmux never reach Windows. autocutsel keeps the two in step.
+- name: Create the autostart folder
+  ansible.builtin.file:
+    path: "{{ target_home }}/.config/autostart"
+    state: directory
+    mode: "0755"
+
+- name: Start autocutsel at login (clipboard -> Windows host)
+  ansible.builtin.copy:
+    src: autocutsel.desktop
+    dest: "{{ target_home }}/.config/autostart/autocutsel.desktop"
+    mode: "0644"
 
 - name: Install boot-time shared folder mount service
   become: true

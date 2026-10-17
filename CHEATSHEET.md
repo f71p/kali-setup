@@ -100,7 +100,7 @@ Start: `tmux` · reattach: `tmux a` · list sessions: `tmux ls`
 | prefix `w` | Tree of all sessions and windows |
 | prefix `d` | Detach (everything keeps running; `tmux a` to return) |
 | prefix `r` | Reload `~/.tmux.conf` |
-| prefix `y` | Copy the last command's output (same as `Ctrl+Shift+Y`) |
+| prefix `y` | Copy the last command and its output (same as `Ctrl+Shift+Y`) |
 | Mouse drag | Resize panes, select text (copies to clipboard on release) |
 
 **Copy mode** (scroll back and copy): prefix `[`, or scroll up with the mouse wheel.
@@ -131,7 +131,7 @@ Selecting text copies it automatically. Inside tmux/nvim, hold **Shift** while d
 | `Ctrl+Shift+=` / `-` / `Backspace` | Font bigger / smaller / reset |
 | `Ctrl+Shift+H` | Scrollback in a pager (search with `/`) |
 | `Ctrl+Shift+G` | Output of the last command in a pager |
-| `Ctrl+Shift+Y` | Copy the last command's output to the clipboard (works in tmux too) |
+| `Ctrl+Shift+Y` | Copy the last command and its output to the clipboard (works in tmux too) |
 | `Ctrl+Shift+E` | Pick a URL on screen to open |
 | `Ctrl+Shift+F11` | Fullscreen |
 | `Ctrl+Shift+F5` | Reload `kitty.conf` |
@@ -269,6 +269,7 @@ Images and PDFs preview in the right pane, including inside tmux.
 | `ls /mnt/hgfs/` | Shared folders (mounted automatically at boot) |
 | `sudo mount-shared-folders` | Mount shares added while the VM is running |
 | `restart-vm-tools` | Fix copy/paste or resizing when VMware Tools misbehaves (then reopen kitty/tmux if the terminal still won't copy) |
+| `pgrep -a autocutsel` | Should list two: they make terminal copies reach Windows. If missing: `autocutsel -fork; autocutsel -selection PRIMARY -fork` (see README) |
 
 ---
 
