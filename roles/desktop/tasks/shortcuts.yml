@@ -8,6 +8,13 @@
     property: /commands/custom/<Super>f
     state: absent
 
+- name: Remove Win+1-4 workspace switching (Windows takes Win+number; Ctrl+Alt+1-4 still switches)
+  community.general.xfconf:
+    channel: xfce4-keyboard-shortcuts
+    property: "/xfwm4/custom/<Super>{{ item }}"
+    state: absent
+  loop: [1, 2, 3, 4]
+
 - name: Set app shortcuts
   community.general.xfconf:
     channel: xfce4-keyboard-shortcuts
@@ -30,10 +37,6 @@
     - { key: "<Super>f",         action: fullscreen_key }
     - { key: "<Super>Left",      action: tile_left_key }
     - { key: "<Super>Right",     action: tile_right_key }
-    - { key: "<Super>1", action: workspace_1_key }
-    - { key: "<Super>2", action: workspace_2_key }
-    - { key: "<Super>3", action: workspace_3_key }
-    - { key: "<Super>4", action: workspace_4_key }
     - { key: "<Shift><Super>1", action: move_window_workspace_1_key }
     - { key: "<Shift><Super>2", action: move_window_workspace_2_key }
     - { key: "<Shift><Super>3", action: move_window_workspace_3_key }

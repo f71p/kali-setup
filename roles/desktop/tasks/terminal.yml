@@ -1,0 +1,16 @@
+---
+# Make kitty the default terminal everywhere, not just on Win+Enter.
+
+- name: Set XFCE preferred terminal (file manager "open terminal here", panel button)
+  ansible.builtin.lineinfile:
+    path: "{{ target_home }}/.config/xfce4/helpers.rc"
+    regexp: '^TerminalEmulator='
+    line: TerminalEmulator=kitty
+    create: true
+    mode: "0644"
+
+- name: Set system default terminal (x-terminal-emulator, used by the root terminal launcher)
+  become: true
+  community.general.alternatives:
+    name: x-terminal-emulator
+    path: /usr/bin/kitty
