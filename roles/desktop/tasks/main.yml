@@ -30,3 +30,8 @@
 
 - name: Keyboard layout
   ansible.builtin.include_tasks: keyboard.yml
+
+- name: Timezone
+  become: true
+  community.general.timezone:
+    name: "{{ timezone }}"

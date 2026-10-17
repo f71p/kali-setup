@@ -35,7 +35,7 @@ Once ansible is installed, `ansible-playbook site.yml -K [--tags ...]` does the 
 | `git` | Clones repos from `packages/git-repos.txt` |
 | `dotfiles` | Copies `configs/` into place |
 | `wordlists` | Unzips rockyou (sudo) |
-| `desktop` | Disables XFCE screen lock/blanking; sets keyboard layout (`keyboard_layout`, sudo) |
+| `desktop` | Disables XFCE screen lock/blanking; sets keyboard layout and timezone (`keyboard_layout`, `timezone`, sudo) |
 | `vmware` | VMware guests only: what `kali-tweaks` → Virtualization does (`mount-shared-folders`, `restart-vm-tools`), plus a boot service that mounts shared folders under `/mnt/hgfs` (sudo) |
 
 After editing a config in `configs/`, apply it with `./bootstrap.sh --tags dotfiles`.
@@ -53,6 +53,7 @@ Installed to `~/.local/bin` from `configs/home/.local/bin/`. Each one prints its
 | `fetch` | fastfetch with an animated glitch Kali logo beside it (kitty only, works in tmux); runs when a new kitty window opens |
 | `fetch-logo` | Regenerates the logo GIF (`~/.local/share/fetch/logo.gif`); `FETCH_LOGO_BG` sets the background colour |
 | `fzf-preview <path>` | Preview pane for the `Ctrl+T`/`Ctrl+F` file picker: images via kitty, text via bat, folders listed |
+| `timesync <dc>` | Sets the clock to a DC's time for Kerberos; `timesync reset` back to real time |
 | `tmux-netinfo` | tmux status bar: tun0 IP when the VPN is up, else eth0 |
 | `y` | Opens the yazi file manager (vim keys, `z` fuzzy find, image previews); quitting `cd`s you to where you were |
 
