@@ -65,6 +65,8 @@ All support `-h`.
 | `Ctrl+W` | Delete previous word |
 | `Ctrl+←` / `Ctrl+→` | Move by word |
 | `Esc` `Esc` | Put `sudo` in front of the command (the last one if the line is empty); again to remove it |
+| `Alt+.` | Type the last argument of the previous command (press again for older ones) |
+| `Ctrl+Z` | Suspend a program (e.g. nvim); on an empty prompt, Ctrl+Z again brings it back |
 | `Ctrl+P` | Toggle Kali's one-line / two-line prompt |
 
 The time on the right of the prompt is when that command was run (Enter pressed), handy for reports.
@@ -78,6 +80,7 @@ The time on the right of the prompt is when that command was run (Enter pressed)
 | `ll` / `la` / `l` | Long list with git status / include hidden / one per line (`ls` works as usual) |
 | `lt` / `lt -L3 dir` | Tree view, 2 levels deep (`-L` for more) |
 | `man cmd` | Man pages are coloured |
+| `kitten diff a b` | Side-by-side diff with colours; works on folders and images too (`q` quits) |
 
 `vim` runs Neovim. Start a command with a space to keep it out of history.
 
@@ -103,6 +106,7 @@ Start: `tmux` · reattach: `tmux a` · list sessions: `tmux ls`
 | prefix `d` | Detach (everything keeps running; `tmux a` to return) |
 | prefix `r` | Reload `~/.tmux.conf` |
 | prefix `y` | Copy the last command and its output (same as `Ctrl+Shift+Y`) |
+| prefix `\` | Floating terminal over the current pane; prefix `\` again hides it (what runs in it keeps going) |
 | Mouse drag | Resize panes, select text (copies to clipboard on release) |
 
 **Copy mode** (scroll back and copy): prefix `[`, or scroll up with the mouse wheel.
@@ -135,6 +139,8 @@ Selecting text copies it automatically. Inside tmux/nvim, hold **Shift** while d
 | `Ctrl+Shift+G` | Output of the last command in a pager |
 | `Ctrl+Shift+Y` | Copy the last command and its output to the clipboard (works in tmux too) |
 | `Ctrl+Shift+E` | Pick a URL on screen to open |
+| `Ctrl+Shift+Z` / `Ctrl+Shift+X` | Jump to the previous / next command in the scrollback (not in tmux) |
+| `Ctrl+Shift+G` | Show the last command's output in a pager (not in tmux) |
 | `Ctrl+Shift+P` then `I` / `H` / `F` / `W` | Label every IP / hash / file path / word on screen; press a label to type it into the command line |
 | `Ctrl+Shift+F11` | Fullscreen |
 | `Ctrl+Shift+F5` | Reload `kitty.conf` |
