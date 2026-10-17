@@ -29,6 +29,11 @@ fd-find            # fast file search (Debian names it fdfind; linked to fd by t
 ripgrep            # fast content search
 jq                 # JSON previews
 
+# Nicer everyday commands:
+bat                # cat with syntax highlighting (batcat; aliased to bat/cat)
+eza                # ls with colours, icons, git status, tree
+tealdeer           # tldr: short examples for a command
+
 # Tools:
 cabextract  # extract: .cab
 lz4         # extract: .lz4

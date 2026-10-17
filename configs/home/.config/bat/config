@@ -1,0 +1,4 @@
+# bat (`batcat` on Debian; aliased to bat and cat in ~/.zshrc.d/tools.zsh)
+# base16 uses the terminal's own colours, so it matches kitty's theme
+--theme=base16
+--style=numbers,changes,header

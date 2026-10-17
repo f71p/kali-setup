@@ -262,3 +262,6 @@ fi
 if [ -f /etc/zsh_command_not_found ]; then
     . /etc/zsh_command_not_found
 fi
+
+# Aliases replacing Kali's defaults above (ls, ll, ...)
+[ -f ~/.zshrc.d/aliases ] && . ~/.zshrc.d/aliases

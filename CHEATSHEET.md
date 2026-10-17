@@ -49,7 +49,7 @@ All support `-h`.
 | `Tab` | Fuzzy completion menu (type to filter, `<` `>` switch groups) |
 | `cmd -` then `Tab` | Flags for any tool, read from its `--help` |
 | `Ctrl+R` | Fuzzy search command history |
-| `Ctrl+T` | Insert a file path (fuzzy) |
+| `Ctrl+T` | Insert a file path (fuzzy, with a preview) |
 | `Alt+C` | cd into a folder (fuzzy) |
 | `z <part>` | Jump to a frequently used folder (`z setup` → `~/Projects/setup`) |
 | `zi` | Pick a frequent folder from a list |
@@ -63,6 +63,16 @@ All support `-h`.
 | `Ctrl+W` | Delete previous word |
 | `Ctrl+←` / `Ctrl+→` | Move by word |
 | `Ctrl+P` | Toggle Kali's one-line / two-line prompt |
+
+**Nicer everyday commands**
+
+| Command | Does |
+|---|---|
+| `tldr tar` | Short practical examples for a command (`tldr -l` lists pages) |
+| `cat file` | Syntax-highlighted, otherwise plain. `bat file` adds line numbers and a pager; `\cat` is the original |
+| `ll` / `la` / `l` | Long list with git status / include hidden / one per line (`ls` works as usual) |
+| `lt` / `lt -L3 dir` | Tree view, 2 levels deep (`-L` for more) |
+| `man cmd` | Man pages are coloured |
 
 `vim` runs Neovim. Start a command with a space to keep it out of history.
 
