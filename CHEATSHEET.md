@@ -134,6 +134,7 @@ Selecting text copies it automatically. Inside tmux/nvim, hold **Shift** while d
 | `Ctrl+Shift+G` | Output of the last command in a pager |
 | `Ctrl+Shift+Y` | Copy the last command and its output to the clipboard (works in tmux too) |
 | `Ctrl+Shift+E` | Pick a URL on screen to open |
+| `Ctrl+Shift+P` then `I` / `H` / `F` / `W` | Label every IP / hash / file path / word on screen; press a label to type it into the command line |
 | `Ctrl+Shift+F11` | Fullscreen |
 | `Ctrl+Shift+F5` | Reload `kitty.conf` |
 
