@@ -15,5 +15,7 @@ if command -v batcat >/dev/null; then
     alias bat=batcat
     alias cat='batcat --style=plain --paging=never'
     export MANPAGER="sh -c 'col -bx | batcat -l man -p'" MANROFFOPT=-c   # coloured man pages
-    export FZF_CTRL_T_OPTS="--preview 'batcat --color=always --style=numbers --line-range=:300 {} 2>/dev/null || ls -1 --color=always {}'"
 fi
+
+# File picker (ctrl+T / ctrl+F) preview: bat if installed, else cat; folders are listed
+export FZF_CTRL_T_OPTS="--preview '(batcat --color=always --style=numbers --line-range=:300 {} || cat {}) 2>/dev/null || ls -1 --color=always {}'"
