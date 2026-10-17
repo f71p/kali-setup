@@ -19,5 +19,11 @@
     - ansible_facts.env.DBUS_SESSION_BUS_ADDRESS is defined
     - ansible_facts.env.XDG_CURRENT_DESKTOP | default('') == 'XFCE'
 
+- name: Keyboard shortcuts
+  ansible.builtin.include_tasks: shortcuts.yml
+  when:
+    - ansible_facts.env.DBUS_SESSION_BUS_ADDRESS is defined
+    - ansible_facts.env.XDG_CURRENT_DESKTOP | default('') == 'XFCE'
+
 - name: Keyboard layout
   ansible.builtin.include_tasks: keyboard.yml
