@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# clip — copy to the system clipboard (reaches the VMware host), or print it.
+#   cmd | clip     copy command output
+#   clip <file>    copy a file's contents
+#   clip           print the clipboard
+# Copies via OSC 52 so the terminal (kitty) owns the selection: xclip-owned text
+# never reaches the host. Falls back to xclip when there's no terminal.
+set -euo pipefail
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"; exit 0
+fi
+
+if [ $# -eq 0 ] && [ -t 0 ]; then
+    exec xclip -o -selection clipboard
+fi
+
+data=$(cat -- "$@"; printf x); data=${data%x}   # keep trailing newlines
+
+if [ -w /dev/tty ] && { [ -n "${TMUX:-}" ] || [ -n "${KITTY_WINDOW_ID:-}" ]; }; then
+    printf '\e]52;c;%s\a' "$(printf %s "$data" | base64 -w0)" > /dev/tty
+else
+    printf %s "$data" | xclip -i -selection clipboard
+fi

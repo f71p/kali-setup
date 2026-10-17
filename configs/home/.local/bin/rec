@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# rec [label] — record this terminal (output only) until you type `exit`.
+# Saves ~/logs/<date>/<time>_<label>.log plus a .timing file for `scriptreplay`.
+# Inside tmux, the pane is marked so the status bar shows ● REC while it runs.
+# Output only on purpose: commands show up because the terminal echoes them, but
+# hidden input (passwords at sudo/ssh prompts) is not written to the log.
+set -euo pipefail
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"; exit 0
+fi
+
+if [ -n "${REC_LOG:-}" ]; then
+    echo "rec: already recording to $REC_LOG" >&2
+    exit 1
+fi
+
+[[ ${1:-} != -* ]] || { echo "rec: unknown option: $1 (see rec -h)" >&2; exit 1; }
+label=$(printf %s "${1:-session}" | tr -c 'A-Za-z0-9._-' '_')
+dir="${LOGS:-$HOME/logs}/$(date +%F)"
+base="$dir/$(date +%H%M%S)_$label"
+mkdir -p -- "$dir"
+
+mark()   { [ -n "${TMUX:-}" ] && tmux set -p -t "$TMUX_PANE" @rec "$label" 2>/dev/null || true; }
+unmark() { [ -n "${TMUX:-}" ] && tmux set -p -u -t "$TMUX_PANE" @rec 2>/dev/null || true; }
+trap unmark EXIT
+
+echo "● recording to $base.log  (type 'exit' to stop)"
+mark
+REC_LOG="$base.log" script -q -O "$base.log" -T "$base.timing" -c "${SHELL:-/bin/bash}" || true
+echo "■ stopped recording: $base.log"
+echo "  view: logcat $base.log    replay: scriptreplay -T $base.timing $base.log"

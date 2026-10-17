@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# tmux-netinfo — status bar snippet: tun0 IP (VPN) as a dark-green label if up, else eth0 dimmed.
+ip4() { ip -4 -o addr show dev "$1" 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -1; }
+if a=$(ip4 tun0) && [ -n "$a" ]; then
+    printf '#[bg=colour22 fg=white bold] tun0 %s #[default]' "$a"
+elif a=$(ip4 eth0) && [ -n "$a" ]; then
+    printf '#[fg=colour238]eth0 %s#[default]' "$a"
+else
+    printf '#[fg=colour238]no network#[default]'
+fi

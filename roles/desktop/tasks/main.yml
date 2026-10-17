@@ -1,0 +1,23 @@
+---
+# XFCE: never lock or blank the screen (convenient on a VM).
+# Needs the desktop session's D-Bus, so run from a terminal inside the desktop; skipped otherwise.
+
+- name: Disable screen lock and blanking
+  community.general.xfconf:
+    channel: "{{ item.channel }}"
+    property: "{{ item.property }}"
+    value_type: "{{ item.type }}"
+    value: "{{ item.value }}"
+  loop:
+    - { channel: xfce4-screensaver,   property: /saver/enabled,                                type: bool, value: false }
+    - { channel: xfce4-screensaver,   property: /lock/enabled,                                 type: bool, value: false }
+    - { channel: xfce4-power-manager, property: /xfce4-power-manager/dpms-enabled,             type: bool, value: false }
+    - { channel: xfce4-power-manager, property: /xfce4-power-manager/blank-on-ac,              type: int,  value: 0 }
+    - { channel: xfce4-power-manager, property: /xfce4-power-manager/lock-screen-suspend-hibernate, type: bool, value: false }
+  loop_control: { label: "{{ item.channel }}{{ item.property }} = {{ item.value }}" }
+  when:
+    - ansible_env.DBUS_SESSION_BUS_ADDRESS is defined
+    - ansible_env.XDG_CURRENT_DESKTOP | default('') == 'XFCE'
+
+- name: Keyboard layout
+  ansible.builtin.include_tasks: keyboard.yml

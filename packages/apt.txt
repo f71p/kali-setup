@@ -1,0 +1,31 @@
+# APT packages — one per line, '#' for comments.
+# Prerequisites for the other modules:
+pipx
+golang-go
+git
+gh          # from GitHub's apt repo (apt_repositories in group_vars/all.yml)
+cargo
+# man-spider extras: .doc parsing and OCR of images
+antiword
+tesseract-ocr
+
+# Shell:
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+fzf
+zoxide
+
+# Terminal & editor:
+kitty
+neovim
+xclip
+fonts-jetbrains-mono
+
+# Tools:
+cabextract  # extract: .cab
+lz4         # extract: .lz4
+ffuf
+peass
+seclists
+testssl.sh
