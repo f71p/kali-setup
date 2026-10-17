@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# fzf-preview <path> — preview pane for the fzf file picker (ctrl+T / ctrl+F).
+# Images are drawn by kitty (also inside tmux), text goes through bat, folders are listed.
+set -uo pipefail
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"; exit 0
+fi
+
+f=${1/#\~/$HOME}
+
+if [[ -d $f ]]; then
+    if command -v eza >/dev/null; then eza -1 --color=always --icons=always --group-directories-first "$f"
+    else ls -1 --color=always "$f"; fi
+    exit
+fi
+[[ -e $f ]] || exit 0
+
+mime=$(file -bL --mime-type -- "$f")
+if [[ $mime == image/* && -n ${KITTY_WINDOW_ID:-} ]] && command -v kitten >/dev/null; then
+    # Fill the preview pane. Unicode placeholders keep the image inside fzf's text, so tmux handles it.
+    # The last line is dropped (fzf would scroll) and colours are reset after it.
+    kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no \
+        --place="${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0" -- "$f" | sed '$d' | sed $'$s/$/\e[m/'
+elif [[ $mime == text/* || $mime == application/json || $mime == inode/x-empty || $mime == application/x-*script* ]]; then
+    if command -v batcat >/dev/null; then batcat --color=always --style=numbers --line-range=:300 -- "$f"
+    else head -300 -- "$f"; fi
+else
+    file -bL -- "$f"                                    # binary: say what it is
+fi

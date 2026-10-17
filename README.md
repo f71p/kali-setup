@@ -52,6 +52,7 @@ Installed to `~/.local/bin` from `configs/home/.local/bin/`. Each one prints its
 | `logcat <log>` | Shows a `rec` log as plain text; replay with `scriptreplay -T <file>.timing <file>.log` |
 | `fetch` | fastfetch with an animated glitch Kali logo beside it (kitty only, works in tmux); runs when a new kitty window opens |
 | `fetch-logo` | Regenerates the logo GIF (`~/.local/share/fetch/logo.gif`); `FETCH_LOGO_BG` sets the background colour |
+| `fzf-preview <path>` | Preview pane for the `Ctrl+T`/`Ctrl+F` file picker: images via kitty, text via bat, folders listed |
 | `tmux-netinfo` | tmux status bar: tun0 IP when the VPN is up, else eth0 |
 | `y` | Opens the yazi file manager (vim keys, `z` fuzzy find, image previews); quitting `cd`s you to where you were |
 
