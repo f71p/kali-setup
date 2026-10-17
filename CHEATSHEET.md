@@ -100,6 +100,7 @@ Start: `tmux` · reattach: `tmux a` · list sessions: `tmux ls`
 | prefix `w` | Tree of all sessions and windows |
 | prefix `d` | Detach (everything keeps running; `tmux a` to return) |
 | prefix `r` | Reload `~/.tmux.conf` |
+| prefix `y` | Copy the last command's output (same as `Ctrl+Shift+Y`) |
 | Mouse drag | Resize panes, select text (copies to clipboard on release) |
 
 **Copy mode** (scroll back and copy): prefix `[`, or scroll up with the mouse wheel.
@@ -130,7 +131,7 @@ Selecting text copies it automatically. Inside tmux/nvim, hold **Shift** while d
 | `Ctrl+Shift+=` / `-` / `Backspace` | Font bigger / smaller / reset |
 | `Ctrl+Shift+H` | Scrollback in a pager (search with `/`) |
 | `Ctrl+Shift+G` | Output of the last command in a pager |
-| `Ctrl+Shift+Y` | Copy the last command's output to the clipboard (not inside tmux) |
+| `Ctrl+Shift+Y` | Copy the last command's output to the clipboard (works in tmux too) |
 | `Ctrl+Shift+E` | Pick a URL on screen to open |
 | `Ctrl+Shift+F11` | Fullscreen |
 | `Ctrl+Shift+F5` | Reload `kitty.conf` |
