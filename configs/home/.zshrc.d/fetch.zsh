@@ -2,6 +2,7 @@
 # Shown automatically when a new kitty window opens (not in every tmux pane); run `fetch` any time.
 fetch() {
     local img=${FETCH_LOGO:-$HOME/.local/share/fetch/logo.gif}
+    command -v fastfetch >/dev/null || { echo "fetch: needs fastfetch (./bootstrap.sh --tags apt)" >&2; return 1; }
     if [[ -z $KITTY_WINDOW_ID || ! -f $img ]] || ! command -v kitten >/dev/null; then
         fastfetch; return                                  # no kitty or no logo: plain fastfetch
     fi
