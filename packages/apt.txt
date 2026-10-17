@@ -35,6 +35,8 @@ eza                # ls with colours, icons, git status, tree
 tealdeer           # tldr: short examples for a command
 
 # Tools:
+rdate              # timesync: DC time over NTP
+faketime           # run one command at another time
 cabextract  # extract: .cab
 lz4         # extract: .lz4
 ffuf
