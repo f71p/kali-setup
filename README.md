@@ -2,6 +2,8 @@
 
 Ansible playbook that sets up a Kali machine with my tools and configs.
 
+**Daily usage: see [CHEATSHEET.md](CHEATSHEET.md)** (scripts, zsh, tmux, kitty, Neovim, yazi, desktop shortcuts, tools).
+
 ## Fresh machine
 
 ```sh
