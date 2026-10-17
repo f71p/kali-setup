@@ -1,7 +1,7 @@
 ---
 # User the machine is being set up for (playbook runs as this user, escalates per-task).
-target_user: "{{ ansible_user_id }}"
-target_home: "{{ ansible_env.HOME }}"
+target_user: "{{ ansible_facts.user_id }}"
+target_home: "{{ ansible_facts.env.HOME }}"
 
 packages_dir: "{{ playbook_dir }}/packages"
 configs_dir: "{{ playbook_dir }}/configs"

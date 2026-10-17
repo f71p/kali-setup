@@ -16,8 +16,8 @@
     - { channel: xfce4-power-manager, property: /xfce4-power-manager/lock-screen-suspend-hibernate, type: bool, value: false }
   loop_control: { label: "{{ item.channel }}{{ item.property }} = {{ item.value }}" }
   when:
-    - ansible_env.DBUS_SESSION_BUS_ADDRESS is defined
-    - ansible_env.XDG_CURRENT_DESKTOP | default('') == 'XFCE'
+    - ansible_facts.env.DBUS_SESSION_BUS_ADDRESS is defined
+    - ansible_facts.env.XDG_CURRENT_DESKTOP | default('') == 'XFCE'
 
 - name: Keyboard layout
   ansible.builtin.include_tasks: keyboard.yml
