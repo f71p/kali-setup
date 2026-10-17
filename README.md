@@ -73,7 +73,7 @@ Installed to `~/.local/bin` from `configs/home/.local/bin/`. Each one prints its
 | `group_vars/all.yml` | Paths, settings, extra apt repositories (e.g. GitHub CLI) |
 
 List files: one entry per line, `#` starts a comment, blank lines ignored.
-Overwritten config files are backed up next to the original with a timestamp suffix.
+Overwritten config files are backed up next to the original with a timestamp suffix; the newest 3 per file are kept (`dotfiles_backups_kept`).
 
 ## Adding a module
 

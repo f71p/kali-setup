@@ -6,6 +6,9 @@ target_home: "{{ ansible_facts.env.HOME }}"
 packages_dir: "{{ playbook_dir }}/packages"
 configs_dir: "{{ playbook_dir }}/configs"
 
+# Timestamped backups kept per config file when the playbook overwrites it (git has the full history).
+dotfiles_backups_kept: 3
+
 # Where tools from packages/git-repos.txt are cloned.
 git_repos_dir: "{{ target_home }}/tools"
 

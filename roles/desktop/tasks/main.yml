@@ -25,5 +25,8 @@
     - ansible_facts.env.DBUS_SESSION_BUS_ADDRESS is defined
     - ansible_facts.env.XDG_CURRENT_DESKTOP | default('') == 'XFCE'
 
+- name: Default terminal
+  ansible.builtin.include_tasks: terminal.yml
+
 - name: Keyboard layout
   ansible.builtin.include_tasks: keyboard.yml

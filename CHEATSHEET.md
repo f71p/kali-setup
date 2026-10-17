@@ -243,7 +243,7 @@ Images and PDFs preview in the right pane, including inside tmux.
 | `Print` / `Shift+Print` | Screenshot: screen / region (add `Ctrl` to copy to clipboard instead) |
 | `Alt+F2` | Run a command |
 
-`Win+L` and `Win+1`–`9` are taken by Windows, not the VM.
+`Win+L` and `Win+1`–`9` are taken by Windows, so they don't reach the VM. kitty is the default terminal everywhere (file manager, panel).
 
 **VMware**
 

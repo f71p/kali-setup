@@ -20,6 +20,20 @@
   loop: "{{ lookup('community.general.filetree', configs_dir ~ '/home', wantlist=True) | selectattr('state', 'eq', 'file') | rejectattr('path', 'search', '\\.gitkeep$') | list }}"
   loop_control: { label: "{{ item.path }}" }
 
+- name: Keep only the newest {{ dotfiles_backups_kept }} backups of each home config file
+  ansible.builtin.shell: |
+    n=0
+    for f in {{ lookup('community.general.filetree', configs_dir ~ '/home', wantlist=True)
+                | selectattr('state', 'eq', 'file') | map(attribute='path')
+                | map('regex_replace', '^', target_home ~ '/') | map('quote') | join(' ') }}; do
+      for old in $(ls -1t -- "$f".*~ 2>/dev/null | tail -n +{{ dotfiles_backups_kept + 1 }}); do
+        rm -f -- "$old" && n=$((n+1))
+      done
+    done
+    echo "removed $n"
+  register: dotfiles_prune
+  changed_when: dotfiles_prune.stdout != 'removed 0'
+
 - name: Create system directories
   become: true
   ansible.builtin.file:
