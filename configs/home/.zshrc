@@ -30,6 +30,7 @@ bindkey '^[[F' end-of-line                        # end
 bindkey '^[[Z' undo                               # shift + tab undo last action
 
 # enable completion features
+fpath=(~/.zsh/completions $fpath)                 # our own completions (e.g. nxc), loaded before compinit
 autoload -Uz compinit
 compinit -d ~/.cache/zcompdump
 zstyle ':completion:*:*:*:*:*' menu select

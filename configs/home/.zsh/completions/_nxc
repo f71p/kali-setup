@@ -1,0 +1,48 @@
+#compdef nxc netexec
+# Completion for NetExec. Protocols are a fixed list; modules (-M) are read live from
+# `nxc <protocol> -L` and cached under ~/.cache/nxc, refreshed when the nxc binary is newer
+# than the cache (so it follows upgrades). Flags come from `nxc <protocol> --help`.
+# nxc is always called by its resolved path: a bare `nxc` isn't found during completion.
+
+_nxc() {
+    local -a protocols
+    protocols=(smb ldap winrm mssql ssh ftp rdp vnc wmi nfs)
+    local bin=${commands[nxc]:-$commands[netexec]}
+
+    # Which protocol is already on the line?
+    local proto="" w
+    for w in ${words[2,CURRENT-1]}; do
+        if (( ${protocols[(I)$w]} )); then proto=$w; break; fi
+    done
+
+    # Word 1 (right after `nxc`): offer the protocols.
+    if [[ -z $proto ]]; then
+        _describe -t protocols 'protocol' protocols && return
+    fi
+
+    # After -M / --module: module names (with descriptions) for this protocol.
+    if [[ $words[CURRENT-1] == (-M|--module) && -n $bin ]]; then
+        local cache=${XDG_CACHE_HOME:-$HOME/.cache}/nxc/modules-$proto
+        if [[ ! -s $cache || $bin -nt $cache ]]; then
+            mkdir -p ${cache:h}
+            $bin $proto -L 2>/dev/null \
+                | sed -nE 's/^\[\*\] ([^ ]+) +(.*)$/\1:\2/p' > $cache
+        fi
+        local -a mods
+        mods=("${(@f)$(<$cache)}")
+        mods=(${mods:#})                       # drop any empty line
+        (( ${#mods} )) && { _describe -t modules 'module' mods && return }
+    fi
+
+    # Flags: parse `nxc <protocol> --help` so protocol-specific options are offered.
+    if [[ $PREFIX == -* && -n $bin ]]; then
+        local -a flags
+        flags=("${(@f)$($bin $proto --help 2>/dev/null \
+            | grep -oE '[[:space:]]--?[a-zA-Z][a-zA-Z0-9-]*' | sed -E 's/^[[:space:]]+//' | sort -u)}")
+        (( ${#flags} )) && { compadd -a flags && return }
+    fi
+
+    _default
+}
+
+_nxc "$@"
