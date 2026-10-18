@@ -50,6 +50,7 @@ All support `-h`.
 |---|---|
 | `Tab` | Fuzzy completion menu (type to filter, `<` `>` switch groups) |
 | `cmd -` then `Tab` | Flags for any tool, read from its `--help` |
+| `nxc smb -M` then `Tab` | NetExec: Tab after a protocol lists its modules (live from `nxc <proto> -L`); `-` then Tab lists that protocol's flags |
 | `Ctrl+R` | Fuzzy search command history |
 | `Ctrl+T` / `Ctrl+F` | Insert a file path (fuzzy, with a preview, images too), e.g. `cat ` then `Ctrl+F`. `Tab` marks several |
 | `Alt+C` | cd into a folder (fuzzy) |
