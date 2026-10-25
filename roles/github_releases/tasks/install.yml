@@ -4,6 +4,7 @@
     url: "https://api.github.com/repos/{{ gh_repo }}/releases/latest"
     headers: { Accept: application/vnd.github+json }
   register: gh_release
+  check_mode: false   # read-only, so dry runs (--check) can see what would be installed
 
 - name: "{{ gh_repo }}: pick asset"
   ansible.builtin.set_fact:
@@ -28,6 +29,7 @@
       ansible.builtin.tempfile:
         state: directory
       register: gh_tmp
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
 
     - name: "{{ gh_repo }}: download {{ gh_asset.name }}"
       ansible.builtin.get_url:
@@ -35,12 +37,14 @@
         dest: "{{ gh_tmp.path }}/{{ gh_asset.name }}"
         checksum: "{{ gh_asset.digest | default(omit, true) }}"
         mode: "0644"
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
 
     - name: "{{ gh_repo }}: unpack"
       ansible.builtin.unarchive:
         src: "{{ gh_tmp.path }}/{{ gh_asset.name }}"
         dest: "{{ gh_tmp.path }}"
       when: gh_archive
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
 
     - name: "{{ gh_repo }}: find {{ gh_binaries | join(', ') }}"
       ansible.builtin.find:
@@ -70,3 +74,4 @@
         path: "{{ gh_tmp.path }}"
         state: absent
       when: gh_tmp.path is defined
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
