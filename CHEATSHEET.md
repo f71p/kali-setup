@@ -1,7 +1,8 @@
 # Cheat sheet
 
 Daily reference for everything this playbook sets up. Keys are written as `Ctrl+A`, `Win+F`, etc.
-In tmux, **prefix** means `Ctrl+A` (press, release, then the next key).
+In tmux, **prefix** means `Ctrl+A` (press, release, then the next key). The scheme behind the keys is in [keybinds.md](keybinds.md):
+**Q** closes, **Shift+Esc** shuts the whole thing down, plain **Esc** only ever backs out.
 
 - [My scripts](#my-scripts)
 - [Shell (zsh)](#shell-zsh)
@@ -10,6 +11,7 @@ In tmux, **prefix** means `Ctrl+A` (press, release, then the next key).
 - [Neovim](#neovim)
 - [yazi](#yazi)
 - [Desktop (XFCE) and VMware](#desktop-xfce-and-vmware)
+- [WSL and Windows Terminal](#wsl-and-windows-terminal)
 - [This playbook](#this-playbook)
 
 ---
@@ -95,20 +97,26 @@ Start: `tmux` · reattach: `tmux a` · list sessions: `tmux ls`
 |---|---|
 | prefix `v` | Split side by side (new pane in same folder) |
 | prefix `s` | Split stacked |
+| prefix `Enter` | New pane, split along the longer side |
 | prefix `h` `j` `k` `l` | Move between panes (or click with the mouse) |
-| prefix `z` | Zoom pane full-window / back |
-| prefix `x` | Close pane |
-| prefix `Space` | Cycle pane layouts |
-| prefix `c` | New window |
+| prefix `H` `J` `K` `L` | Swap the pane with the one in that direction |
+| prefix `r` then `h` `j` `k` `l` | Resize mode: keep pressing to resize, `Esc` to leave |
+| prefix `f` | Zoom pane full-window / back (prefix `z` works too) |
+| prefix `q` | Close pane (asks first) |
+| prefix `Q` | Close window (asks first) |
+| prefix `Shift+Esc` | Kill the whole session and everything in it (asks first) |
+| prefix `o` | Cycle pane layouts |
+| prefix `c` | New window (same folder) |
 | prefix `1`–`9` | Go to window (numbered from 1) |
+| prefix `Shift+1`–`9` | Send the pane to window N (made if needed) |
+| prefix `Tab` | Last window |
 | prefix `n` / `p` | Next / previous window |
-| prefix `,` | Rename window |
-| prefix `w` | Tree of all sessions and windows |
+| prefix `Space` (or `w`) | Tree of all sessions and windows |
 | prefix `d` | Detach (everything keeps running; `tmux a` to return) |
-| prefix `r` | Reload `~/.tmux.conf` |
+| prefix `R` | Reload `~/.tmux.conf` |
 | prefix `y` | Copy the last command and its output (same as `Ctrl+Shift+Y`) |
 | prefix `,` | Rename the window. Otherwise tabs name themselves: the running program, or the folder when idle |
-| prefix `\` | Floating terminal over the current pane; prefix `\` again hides it (what runs in it keeps going) |
+| prefix `F` | Floating terminal over the current pane; prefix `F` again hides it (what runs in it keeps going) |
 | Mouse drag | Resize panes, select text (copies to clipboard on release) |
 
 **Copy mode** (scroll back and copy): prefix `[`, or scroll up with the mouse wheel.
@@ -118,9 +126,9 @@ Start: `tmux` · reattach: `tmux a` · list sessions: `tmux ls`
 | `Ctrl+U` / `Ctrl+D` | Half page up / down |
 | `g` / `G` | Top / bottom |
 | `/` / `?` then `n` | Search down / up, next match |
-| `Space` … `Enter` | Start selection … copy to clipboard |
-| `v` | Toggle block (rectangle) selection |
-| `q` | Leave copy mode |
+| `v` … `y` | Start selection … copy to clipboard |
+| `Ctrl+V` | Toggle block (rectangle) selection |
+| `q` / `Esc` | Leave copy mode |
 
 Status bar: **● REC** while `rec` runs · VPN IP (green `tun0`, or grey `eth0`) · clock.
 
@@ -146,6 +154,7 @@ Selecting text copies it automatically. Inside tmux/nvim, hold **Shift** while d
 | `Ctrl+Shift+P` then `I` / `H` / `F` / `W` | Label every IP / hash / file path / word on screen; press a label to type it into the command line |
 | `Ctrl+Shift+F11` | Fullscreen |
 | `Ctrl+Shift+F5` | Reload `kitty.conf` |
+| `Shift+Esc` | Sent as its own key, so tmux and Neovim can use it to shut down (does nothing at a bare prompt) |
 
 ---
 
@@ -169,6 +178,7 @@ Run `nvim file` (or `vim file`). **Leader** is `Space`. `Esc` gets you back to n
 |---|---|
 | `Space w` | Save |
 | `Space q` | Quit |
+| `Shift+Esc` | Quit everything (asks if anything is unsaved) |
 | `:wq` / `:q!` | Save and quit / quit without saving |
 | `:e file` | Open another file |
 
@@ -217,8 +227,9 @@ Prefix a number to repeat: `5dd` deletes 5 lines, `3w` moves 3 words.
 | Key | Does |
 |---|---|
 | `Space e` | File browser (`Enter` open, `-` up a folder, `%` new file, `d` new folder, `D` delete, `R` rename) |
-| `:vsp file` / `:sp file` | Split side by side / stacked |
-| `Ctrl+H` `J` `K` `L` | Move between splits |
+| `:vsp file` / `:sp file` | Split side by side / stacked (usually a tmux pane is simpler) |
+| `Ctrl+W` then `h` `j` `k` `l` | Move between splits |
+| `Ctrl+W` then `q` | Close a split (e.g. a help window) |
 | `:bn` / `:bp` / `:ls` | Next / previous / list open files |
 
 ---
@@ -263,7 +274,8 @@ Images and PDFs preview in the right pane, including inside tmux.
 | `Win+Space` | App launcher (type, `Enter`) |
 | `Win+←` / `Win+→` | Snap window to left / right half |
 | `Win+F` | Toggle fullscreen |
-| `Win+Backspace` | Close window (`Alt+F4` also works) |
+| `Win+Q` | Close window (`Alt+F4` also works) |
+| `Win+Shift+Esc` | Log out |
 | `Ctrl+Alt+1`–`4` | Switch workspace |
 | `Win+Shift+1`–`4` | Move window to workspace |
 | `Win+E` | File manager |
@@ -281,6 +293,27 @@ Images and PDFs preview in the right pane, including inside tmux.
 | `sudo mount-shared-folders` | Mount shares added while the VM is running |
 | `restart-vm-tools` | Fix copy/paste or resizing when VMware Tools misbehaves (then reopen kitty/tmux if the terminal still won't copy) |
 | `pgrep -a autocutsel` | Should list two: they make terminal copies reach Windows. If missing: `autocutsel -fork; autocutsel -selection PRIMARY -fork` (see README) |
+
+---
+
+## WSL and Windows Terminal
+
+Same shell, tmux and Neovim as the VM. The `wsl` tag sets up the Windows side (keys only; Windows Terminal keeps its own colours). Afterwards close **every** Windows Terminal window once: it only loads new fonts when it fully restarts.
+
+**Open Kali from the Terminal app** (Kali is its default profile), not the "kali-linux" Start menu entry. That entry starts
+WSL in a plain console, which Windows hands to Windows Terminal without its profile, so you'd get the default font (icons
+turn into diamonds) and none of the profile's settings.
+
+| Keys | Does |
+|---|---|
+| select text | Copies it (like kitty). Inside tmux/nvim, hold **Shift** while dragging to select with Windows Terminal |
+| `Ctrl+Shift+C` / `Ctrl+Shift+V` | Copy / paste (`Ctrl+C` and `Ctrl+V` go to the program: interrupt, nvim block select) |
+| `Ctrl+Shift+T` / `Ctrl+Shift+Q` | New tab / close tab |
+| `Shift+Esc` | Sent as its own key, as in kitty |
+| `xdg-open url` / `xdg-open file` | Opens links in the Windows default browser, files in their Windows app. Tools that open a browser (`gh auth login`, Python...) do the same |
+
+Copying uses OSC 52 like on the VM; pasting into `clip` and Neovim reads Windows through `win32yank.exe`.
+If paste stops working in an old tmux session, press Enter at a prompt once (`wsl.zsh` reconnects to Windows).
 
 ---
 

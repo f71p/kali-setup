@@ -1,10 +1,13 @@
 # APT packages — one per line, '#' for comments.
 # Prerequisites for the other modules:
 pipx
+python3-dev # headers for pipx tools that compile parts (netexec: netifaces, arc4); not in Kali's WSL image
 golang-go
 git
 gh          # from GitHub's apt repo (apt_repositories in group_vars/all.yml)
 cargo
+unzip       # .zip releases (github_releases role, e.g. win32yank on WSL)
+xz-utils    # .tar.xz downloads (Nerd Font on WSL)
 # man-spider extras: .doc parsing and OCR of images
 antiword
 tesseract-ocr
@@ -18,8 +21,10 @@ zoxide
 
 # Terminal & editor:
 kitty
+tmux
 neovim
 xclip
+xdg-utils          # xdg-open (on WSL it opens links in the Windows browser; $BROWSER in wsl.zsh)
 fonts-jetbrains-mono
 fastfetch          # system info (fetch draws the animated logo beside it)
 imagemagick        # builds the fetch logo (fetch-logo)
@@ -42,4 +47,5 @@ lz4         # extract: .lz4
 ffuf
 peass
 seclists
+wordlists   # rockyou.txt.gz (unzipped by the wordlists role); preinstalled on the VM, not on WSL
 testssl.sh

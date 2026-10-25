@@ -1,0 +1,126 @@
+---
+# Kali on WSL inside Windows Terminal. Runs only on WSL (is_wsl in group_vars/all.yml).
+# Copying already works through OSC 52 (tmux, nvim, clip), as in kitty; this adds what WSL lacks:
+# paste from Windows, zsh as the login shell, and Windows Terminal's keys (its own colours are kept).
+
+- name: Make zsh the login shell (Kali on WSL starts in bash)
+  become: true
+  ansible.builtin.user:
+    name: "{{ target_user }}"
+    shell: /usr/bin/zsh
+
+# win32yank reads/writes the Windows clipboard: paste for nvim and clip, and clip's copy outside tmux.
+- name: Ensure install and state directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ target_home }}/.local/bin"
+    - "{{ github_releases_state_dir }}"
+
+- name: Install win32yank (Windows clipboard)
+  ansible.builtin.include_role:
+    name: github_releases
+    tasks_from: install
+    apply: { tags: [wsl] }
+  vars:
+    gh_repo: equalsraf/win32yank
+    gh_pattern: 'win32yank-x64\.zip$'
+    gh_binaries: [win32yank.exe]
+
+# ── Windows side ─────────────────────────────────────────
+- name: Find the Windows user's AppData\Local
+  ansible.builtin.shell: wslpath "$(cmd.exe /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+  args: { chdir: /mnt/c }
+  register: wsl_localappdata
+  changed_when: false
+  check_mode: false   # read-only, so dry runs (--check) see the real paths
+
+- name: Set Windows paths
+  ansible.builtin.set_fact:
+    wsl_fonts_dir: "{{ wsl_localappdata.stdout }}/Microsoft/Windows/Fonts"
+    wsl_font_staging: "{{ wsl_localappdata.stdout }}/Temp/kali-setup-fonts"
+    wsl_font_files:
+      - JetBrainsMonoNerdFont-Regular.ttf
+      - JetBrainsMonoNerdFont-Bold.ttf
+      - JetBrainsMonoNerdFont-Italic.ttf
+      - JetBrainsMonoNerdFont-BoldItalic.ttf
+
+- name: Check for the Nerd Font
+  ansible.builtin.stat:
+    path: "{{ wsl_fonts_dir }}/JetBrainsMonoNerdFont-Regular.ttf"
+  register: wsl_font
+
+# Per-user font install (no admin) through the Windows Fonts folder, same as right-click > Install.
+# Copying the files and writing the registry by hand isn't enough: other programs see the font, but
+# Windows Terminal (a Store app) doesn't.
+- name: Install JetBrainsMono Nerd Font for Windows Terminal
+  when: not wsl_font.stat.exists
+  block:
+    - name: Create temp dir
+      ansible.builtin.tempfile:
+        state: directory
+      register: wsl_tmp
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
+
+    - name: Download JetBrainsMono Nerd Font {{ nerd_font_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ nerd_font_version }}/JetBrainsMono.tar.xz"
+        dest: "{{ wsl_tmp.path }}/JetBrainsMono.tar.xz"
+        checksum: "sha256:{{ nerd_font_sha256 }}"
+        mode: "0644"
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
+
+    - name: Unpack the four styles
+      ansible.builtin.unarchive:
+        src: "{{ wsl_tmp.path }}/JetBrainsMono.tar.xz"
+        dest: "{{ wsl_tmp.path }}"
+        include: "{{ wsl_font_files }}"
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
+
+    - name: Stage fonts on the Windows side (the Fonts folder can't read WSL paths reliably)
+      ansible.builtin.copy:
+        src: "{{ wsl_tmp.path }}/{{ item }}"
+        dest: "{{ wsl_font_staging }}/{{ item }}"
+      loop: "{{ wsl_font_files }}"
+
+    - name: Install fonts through the Windows Fonts folder
+      ansible.builtin.command: >-
+        powershell.exe -NoProfile -Command
+        "$f = (New-Object -ComObject Shell.Application).Namespace(0x14);
+        Get-ChildItem \"$env:LOCALAPPDATA\Temp\kali-setup-fonts\" -Filter *.ttf | % { $f.CopyHere($_.FullName, 0x14) }"
+      args: { chdir: /mnt/c }
+
+  always:
+    - name: Remove temp dir
+      ansible.builtin.file:
+        path: "{{ wsl_tmp.path }}"
+        state: absent
+      when: wsl_tmp.path is defined
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
+
+    - name: Remove the Windows staging folder
+      ansible.builtin.file:
+        path: "{{ wsl_font_staging }}"
+        state: absent
+
+- name: Find Windows Terminal's settings.json
+  ansible.builtin.shell: >-
+    ls -1 "{{ wsl_localappdata.stdout }}"/Packages/Microsoft.WindowsTerminal_*/LocalState/settings.json
+    "{{ wsl_localappdata.stdout }}/Microsoft/Windows Terminal/settings.json" 2>/dev/null || true
+  register: wsl_wt_settings
+  changed_when: false
+  check_mode: false   # read-only, so dry runs (--check) see the real paths
+
+# Keys from keybinds.md and the Nerd Font face (for eza's icons); Windows Terminal's colours and look stay.
+# Backs up settings.json before changing it, keeping the newest {{ dotfiles_backups_kept }}.
+- name: Set up Windows Terminal keys and font
+  ansible.builtin.command: >-
+    python3 {{ role_path }}/files/windows-terminal.py
+    {{ item | quote }} {{ ansible_facts.env.WSL_DISTRO_NAME | quote }} {{ dotfiles_backups_kept }}
+    {{ '--check' if ansible_check_mode else '' }}
+  loop: "{{ wsl_wt_settings.stdout_lines }}"
+  register: wsl_wt
+  changed_when: "'changed' in wsl_wt.stdout"
+  check_mode: false   # the script honours --check itself

@@ -12,7 +12,12 @@
     - { role: git_repos, tags: [git] }
     - { role: dotfiles, tags: [dotfiles] }
     - { role: wordlists, tags: [wordlists] }
-    - { role: desktop, tags: [desktop] }
+    - role: desktop
+      tags: [desktop]
+      when: not is_wsl
     - role: vmware
       tags: [vmware]
       when: ansible_facts.virtualization_type == 'VMware'
+    - role: wsl
+      tags: [wsl]
+      when: is_wsl

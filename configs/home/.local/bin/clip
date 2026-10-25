@@ -5,13 +5,22 @@
 #   clip           print the clipboard
 # Copies via OSC 52 (the terminal sets the clipboard), which also works over SSH.
 # Falls back to xclip when there's no terminal. Reaching the host needs autocutsel (vmware role).
+# On WSL, xclip's jobs go to win32yank (installed by the wsl role), which talks to Windows directly.
 set -euo pipefail
 if [[ ${1:-} == -h || ${1:-} == --help ]]; then
     sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"; exit 0
 fi
 
+if [ -n "${WSL_DISTRO_NAME:-}" ]; then
+    xclip_in()  { win32yank.exe -i --crlf; }
+    xclip_out() { win32yank.exe -o --lf; }
+else
+    xclip_in()  { xclip -i -selection clipboard; }
+    xclip_out() { xclip -o -selection clipboard; }
+fi
+
 if [ $# -eq 0 ] && [ -t 0 ]; then
-    exec xclip -o -selection clipboard
+    xclip_out; exit
 fi
 
 data=$(cat -- "$@"; printf x); data=${data%x}   # keep trailing newlines
@@ -19,5 +28,5 @@ data=$(cat -- "$@"; printf x); data=${data%x}   # keep trailing newlines
 if [ -w /dev/tty ] && { [ -n "${TMUX:-}" ] || [ -n "${KITTY_WINDOW_ID:-}" ]; }; then
     printf '\e]52;c;%s\a' "$(printf %s "$data" | base64 -w0)" > /dev/tty
 else
-    printf %s "$data" | xclip -i -selection clipboard
+    printf %s "$data" | xclip_in
 fi

@@ -8,6 +8,12 @@
     property: /commands/custom/<Super>f
     state: absent
 
+- name: Remove Win+BackSpace close (close is Win+Q, as in keybinds.md)
+  community.general.xfconf:
+    channel: xfce4-keyboard-shortcuts
+    property: /xfwm4/custom/<Super>BackSpace
+    state: absent
+
 - name: Remove Win+1-4 workspace switching (Windows takes Win+number; Ctrl+Alt+1-4 still switches)
   community.general.xfconf:
     channel: xfce4-keyboard-shortcuts
@@ -24,6 +30,7 @@
   loop:
     - { key: "<Super>Return", cmd: kitty }
     - { key: "<Super>space",  cmd: xfce4-appfinder --collapsed }
+    - { key: "<Shift><Super>Escape", cmd: xfce4-session-logout }
   loop_control: { label: "{{ item.key }} = {{ item.cmd }}" }
 
 - name: Set window and workspace shortcuts
@@ -33,7 +40,7 @@
     value_type: string
     value: "{{ item.action }}"
   loop:
-    - { key: "<Super>BackSpace", action: close_window_key }
+    - { key: "<Super>q",         action: close_window_key }
     - { key: "<Super>f",         action: fullscreen_key }
     - { key: "<Super>Left",      action: tile_left_key }
     - { key: "<Super>Right",     action: tile_right_key }

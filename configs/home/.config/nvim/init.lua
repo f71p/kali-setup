@@ -24,14 +24,16 @@ o.mouse = "a"
 o.clipboard = "unnamedplus"   -- share the system clipboard
 
 -- Copy via OSC 52: the terminal (kitty) sets the clipboard, so copying works through tmux
--- (set-clipboard on) and over SSH. Paste still reads the X clipboard.
+-- (set-clipboard on) and over SSH. Paste still reads the X clipboard
+-- (on WSL: the Windows clipboard, through win32yank from the wsl role).
 local osc52 = require("vim.ui.clipboard.osc52")
+local wsl_paste = vim.env.WSL_DISTRO_NAME and { "win32yank.exe", "-o", "--lf" }
 vim.g.clipboard = {
   name = "osc52-copy",
   copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
   paste = {
-    ["+"] = { "xclip", "-o", "-selection", "clipboard" },
-    ["*"] = { "xclip", "-o", "-selection", "primary" },
+    ["+"] = wsl_paste or { "xclip", "-o", "-selection", "clipboard" },
+    ["*"] = wsl_paste or { "xclip", "-o", "-selection", "primary" },
   },
 }
 o.undofile = true             -- undo history survives closing the file
@@ -45,10 +47,8 @@ map("n", "<Esc>", "<cmd>nohlsearch<CR>")          -- clear search highlight
 map("n", "<leader>w", "<cmd>w<CR>")               -- save
 map("n", "<leader>q", "<cmd>q<CR>")               -- quit
 map("n", "<leader>e", "<cmd>Explore<CR>")         -- file browser
-map("n", "<C-h>", "<C-w>h")                       -- move between splits
-map("n", "<C-j>", "<C-w>j")
-map("n", "<C-k>", "<C-w>k")
-map("n", "<C-l>", "<C-w>l")
+map({ "n", "i", "v" }, "<S-Esc>", "<cmd>confirm qa<CR>") -- shut everything down (asks if unsaved)
+-- Splits use the stock Ctrl+W layer (Ctrl+W h/j/k/l, Ctrl+W q), as in keybinds.md
 map("v", "<", "<gv")                              -- keep selection when indenting
 map("v", ">", ">gv")
 map("v", "<LeftRelease>", "ygv")                 -- mouse drag copies, selection stays

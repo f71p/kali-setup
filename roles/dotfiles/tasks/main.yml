@@ -68,8 +68,10 @@
   loop_control: { label: "/{{ item.path }}" }
 
 # Built from Kali's own logo (not stored in the repo); fetch falls back to plain fastfetch without it.
-# Skipped until imagemagick (apt tag) is installed.
+# Skipped until imagemagick (apt tag) is installed, and on WSL (no Kali boot logo there, and fetch
+# only draws it in kitty anyway).
 - name: Generate the fetch logo
+  when: not is_wsl
   ansible.builtin.shell: |
     command -v convert >/dev/null || { echo skipped; exit 0; }
     {{ target_home }}/.local/bin/fetch-logo
