@@ -1,0 +1,1 @@
+# Hides Kali's "minimal installation" login message (kali-motd checks only that this file exists); kali-setup installs the tools instead.
