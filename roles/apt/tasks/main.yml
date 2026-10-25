@@ -4,6 +4,14 @@
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
+  tags: [upgrade]
+
+# Kali is rolling: installing onto an out-of-date system can half-upgrade it. Skip with --skip-tags upgrade.
+- name: Full-upgrade the system (apt full-upgrade)
+  become: true
+  ansible.builtin.apt:
+    upgrade: dist
+  tags: [upgrade]
 
 - name: Install python3-debian (needed to manage apt repositories)
   become: true

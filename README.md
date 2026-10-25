@@ -27,7 +27,8 @@ Once ansible is installed, `ansible-playbook site.yml -K [--tags ...]` does the 
 
 | Tag | What it does |
 |---|---|
-| `apt` | Extra apt repos, then packages from `packages/apt.txt` (sudo) |
+| `apt` | `apt full-upgrade`, extra apt repos, then packages from `packages/apt.txt` (sudo) |
+| `upgrade` | Just the `apt full-upgrade` (part of `apt`; `--skip-tags upgrade` to skip it) |
 | `pipx` | Python tools from `packages/pipx.txt` |
 | `go` | Go tools from `packages/go.txt` |
 | `cargo` | Rust tools from `packages/cargo.txt` (compiles — slow, needs RAM) |
