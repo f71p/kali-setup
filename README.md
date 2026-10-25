@@ -1,108 +1,51 @@
 # Kali setup
 
-Ansible playbook that sets up a Kali machine with my tools and configs.
+Ansible playbook for my Kali machines: the VMware VM and Kali on WSL.
 
-**Daily usage: see [CHEATSHEET.md](CHEATSHEET.md)** (scripts, zsh, tmux, kitty, Neovim, yazi, desktop shortcuts).
+Day-to-day keys and commands: [CHEATSHEET.md](CHEATSHEET.md) (or run `keys`).
+The key scheme behind them: [keybinds.md](keybinds.md).
 
-## Fresh machine
+## What it sets up
+
+- zsh: autosuggestions, fuzzy Tab completion, fzf history/file search, zoxide
+- tmux and Neovim with the same vim-style keys, clipboard shared with Windows
+- kitty on the VM, Windows Terminal on WSL
+- Tools from apt, pipx, go, cargo, GitHub releases and git
+- Small scripts: `clip`, `rec`, `extract`, `timesync`, `keys`, ... (see the cheat sheet)
+- VM only: XFCE shortcuts, no screen lock, VMware shared folders and copy/paste fix
+- WSL only: zsh as login shell, paste from Windows, links open in the Windows browser,
+  Nerd Font and keys for Windows Terminal
+
+## Install
 
 ```sh
 git clone https://github.com/f71p/kali-setup.git ~/Projects/setup
 cd ~/Projects/setup && ./bootstrap.sh
 ```
 
-To push changes back, run `gh auth login` and `gh auth setup-git` (the playbook installs `gh`).
+On WSL, close every Windows Terminal window once afterwards, and open Kali from the Terminal app.
 
 ## Usage
 
 ```sh
-./bootstrap.sh                          # run everything (installs ansible first if needed)
-./bootstrap.sh --tags dotfiles          # run only some modules, comma-separated
-./bootstrap.sh --skip-tags desktop      # run everything except some modules
-./bootstrap.sh --check --diff           # dry run: show what would change
+./bootstrap.sh                       # everything (asks for sudo)
+./bootstrap.sh --tags dotfiles       # only some parts: apt, pipx, go, cargo, releases, git,
+                                     #   dotfiles, wordlists, desktop, vmware, wsl
+./bootstrap.sh --skip-tags upgrade   # skip the apt full-upgrade
+./bootstrap.sh --check --diff        # dry run
 ```
 
-`bootstrap.sh` asks for your sudo password and passes any extra arguments to `ansible-playbook`.
-Once ansible is installed, `ansible-playbook site.yml -K [--tags ...]` does the same thing.
+`desktop` and `vmware` only run on the VM, `wsl` only on WSL.
 
-| Tag | What it does |
-|---|---|
-| `apt` | `apt full-upgrade`, extra apt repos, then packages from `packages/apt.txt` (sudo) |
-| `upgrade` | Just the `apt full-upgrade` (part of `apt`; `--skip-tags upgrade` to skip it) |
-| `pipx` | Python tools from `packages/pipx.txt` |
-| `go` | Go tools from `packages/go.txt` |
-| `cargo` | Rust tools from `packages/cargo.txt` (compiles — slow, needs RAM) |
-| `releases` | Prebuilt binaries from `packages/github-releases.txt` |
-| `git` | Clones repos from `packages/git-repos.txt` |
-| `dotfiles` | Copies `configs/` into place |
-| `wordlists` | Unzips rockyou (sudo) |
-| `desktop` | Disables XFCE screen lock/blanking; sets keyboard layout and timezone (`keyboard_layout`, `timezone`, sudo) |
-| `vmware` | VMware guests only: what `kali-tweaks` → Virtualization does (`mount-shared-folders`, plus our own `restart-vm-tools` that fixes copy/paste), `autocutsel` so terminal copies reach Windows, plus a boot service that mounts shared folders under `/mnt/hgfs` (sudo) |
+## Adding things
 
-After editing a config in `configs/`, apply it with `./bootstrap.sh --tags dotfiles`.
+- Packages: one per line in `packages/*.txt` (`apt`, `pipx`, `go`, `cargo`, `github-releases`, `git-repos`)
+- Configs: `configs/home/` mirrors `~`, `configs/system/` mirrors `/`. Edit here, then `--tags dotfiles`
+  (files in `~` get overwritten, with a timestamped backup)
+- zsh: a new file in `configs/home/.zshrc.d/`
 
-## Scripts
+## If copy/paste to Windows breaks on the VM
 
-Installed to `~/.local/bin` from `configs/home/.local/bin/`. Each one prints its usage with `-h`.
-
-| Command | What it does |
-|---|---|
-| `extract <archive>...` | Unpacks any common archive into a folder named after it |
-| `cmd \| clip`, `clip <file>` | Copies to the clipboard (reaches the Windows host); `clip` alone prints it |
-| `rec [label]` | Records the terminal (output only) to `$LOGS/<date>/` until `exit`; tmux shows ● REC |
-| `logcat <log>` | Shows a `rec` log as plain text; replay with `scriptreplay -T <file>.timing <file>.log` |
-| `keys [search]` | Search every keybind and command in `CHEATSHEET.md` as you type (installed by the dotfiles tag, so re-run it after editing the cheat sheet) |
-| `fetch` | fastfetch with an animated glitch Kali logo beside it (kitty only, works in tmux); runs when a new kitty window opens |
-| `fetch-logo` | Regenerates the logo GIF (`~/.local/share/fetch/logo.gif`); `FETCH_LOGO_BG` sets the background colour |
-| `fzf-preview <path>` | Preview pane for the `Ctrl+T`/`Ctrl+F` file picker: images via kitty, text via bat, folders listed |
-| `timesync <dc>` | Sets the clock to a DC's time for Kerberos; `timesync reset` back to real time |
-| `tmux-netinfo` | tmux status bar: tun0 IP when the VPN is up, else eth0 |
-| `y` | Opens the yazi file manager (vim keys, `z` fuzzy find, image previews); quitting `cd`s you to where you were |
-
-`$LOGS` (`~/logs`) is the central place for recordings and tool output, e.g. `nmap -oA $LOGS/scan`.
-
-## Copy/paste to the Windows host (VMware)
-
-When you switch to Windows, VMware Tools sends whichever of Kali's two copy buffers, the
-clipboard or the highlighted text (PRIMARY), was set most recently. It asks each one's owner for
-a `TIMESTAMP`. kitty doesn't answer that for the clipboard, so VMware always sent the last
-*highlight*: Shift+drag reached Windows, but `Ctrl+Shift+Y`, tmux copies and `clip` didn't.
-(Source: `copyPasteUIX11.cpp` in open-vm-tools.)
-
-The `vmware` tag fixes this with **autocutsel**, which keeps the clipboard and the highlight
-in step (started at login from `~/.config/autostart/autocutsel.desktop`). Side effect:
-highlighting text in any app also replaces the clipboard.
-
-If copying to Windows breaks:
-
-1. Check autocutsel is running: `pgrep -a autocutsel` should list two. If not:
-   `autocutsel -fork; autocutsel -selection PRIMARY -fork`
-2. `restart-vm-tools` (with or without sudo) restarts VMware Tools, keeping the clipboard part
-   running as you. Don't use kali-tweaks' version: it starts it as root, which breaks copy/paste.
-3. Still stuck: reopen kitty/tmux, then suspend and resume the VM.
-
-## Layout
-
-| Path | Purpose |
-|---|---|
-| `packages/apt.txt` | APT packages |
-| `packages/pipx.txt` | Python tools: `<name> [source]`, kept at latest. Use this over apt for Python tools |
-| `packages/go.txt` | Go tools (`go install`, `@latest` default) |
-| `packages/cargo.txt` | Rust tools (`cargo install`), kept at latest |
-| `packages/github-releases.txt` | Prebuilt binaries from GitHub releases → `~/.local/bin`, checksum-verified, kept at latest |
-| `packages/git-repos.txt` | Repos: `<url> [dest]`, default dest `~/tools/<name>` |
-| `configs/home/` | Mirrors `$HOME` — e.g. `configs/home/.tmux.conf` → `~/.tmux.conf` |
-| `configs/home/.zshrc.d/` | Personal zsh config. `.zshrc` itself is Kali's stock file plus a line that loads these, and one at the end for `aliases` (overrides Kali's `ls` aliases) |
-| `configs/system/` | Mirrors `/` — e.g. `configs/system/etc/foo.conf` → `/etc/foo.conf` |
-| `roles/wordlists`, `roles/desktop` | Unzip rockyou; disable XFCE screen lock/blanking |
-| `roles/` | One role per module; tag name matches |
-| `group_vars/all.yml` | Paths, settings, extra apt repositories (e.g. GitHub CLI) |
-
-List files: one entry per line, `#` starts a comment, blank lines ignored.
-Overwritten config files are backed up next to the original with a timestamp suffix; the newest 3 per file are kept (`dotfiles_backups_kept`).
-
-## Adding a module
-
-1. Add `packages/<name>.txt` and a matching `<name>_packages` var in `group_vars/all.yml`.
-2. Create `roles/<name>/tasks/main.yml`.
-3. Add the role with a tag in `site.yml`.
+1. `pgrep -a autocutsel` should list two. If not: `autocutsel -fork; autocutsel -selection PRIMARY -fork`
+2. `restart-vm-tools`
+3. Reopen kitty/tmux, or suspend and resume the VM
