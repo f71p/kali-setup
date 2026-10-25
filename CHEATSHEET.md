@@ -257,11 +257,17 @@ Prefix a number to repeat: `5dd` deletes 5 lines, `3w` moves 3 words.
 | `*` | Search for the word under the cursor |
 | `Esc` | Clear search highlight |
 | `:%s/old/new/g` | Replace everywhere (`/gc` to confirm each) |
+| `]s` / `[s` / `z=` | Next / previous spelling mistake / suggestions (spell check is on in markdown and text files) |
+
+Tabs show as `»`, trailing spaces as `·` and non-breaking spaces as `␣`, so stray whitespace in pasted payloads is visible.
 
 **Files, splits and buffers**
 
 | Key | Does |
 |---|---|
+| `Space f` | Find a file by name: type part of it, matches show as you type, `Tab` / `Enter` to pick |
+| `Space g` | Search inside files (`Space g password`), then `]q` / `[q` next / previous match, `:cclose` hides the list |
+| `Space b` | Switch to another open file (same as-you-type matching) |
 | `Space e` | File browser (`Enter` open, `-` up a folder, `%` new file, `d` new folder, `D` delete, `R` rename) |
 | `:vsp file` / `:sp file` | Split side by side / stacked (usually a tmux pane is simpler) |
 | `Ctrl+W` then `h` `j` `k` `l` | Move between splits |

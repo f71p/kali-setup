@@ -40,6 +40,39 @@ o.undofile = true             -- undo history survives closing the file
 o.splitright = true
 o.splitbelow = true
 o.updatetime = 250
+o.list = true                 -- show tabs, trailing spaces and odd spaces (handy for pasted payloads)
+o.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+o.spelllang = "en_gb"
+
+-- Finding things (built in, no plugins): :find uses fd, :grep uses rg, both skip .git
+o.wildoptions:append("fuzzy")
+o.wildmode = "noselect:lastused,full"   -- show matches without filling in the first one
+o.pumheight = 15
+o.grepprg = "rg --vimgrep --smart-case --hidden --glob=!.git"
+local files_cache
+function _G.FdFind(arg)
+  files_cache = files_cache or vim.fn.systemlist({ "fd", "--type=f", "--hidden", "--exclude=.git" })
+  return arg == "" and files_cache or vim.fn.matchfuzzy(files_cache, arg)
+end
+o.findfunc = "v:lua.FdFind"
+-- Run fd once per command line, not on every key
+vim.api.nvim_create_autocmd("CmdlineEnter", { pattern = ":", callback = function() files_cache = nil end })
+-- Show matches as you type in :find and :buffer
+vim.api.nvim_create_autocmd("CmdlineChanged", {
+  pattern = ":",
+  callback = function()
+    if vim.fn.getcmdline():match("^%s*fin?d?%s") or vim.fn.getcmdline():match("^%s*b%a*%s") then
+      vim.fn.wildtrigger()
+    end
+  end,
+})
+-- Open the match list after :grep
+vim.api.nvim_create_autocmd("QuickFixCmdPost", { pattern = "grep", command = "cwindow" })
+-- Spell check prose only
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "markdown", "text", "gitcommit" },
+  callback = function() vim.opt_local.spell = true end,
+})
 
 -- Keymaps
 local map = vim.keymap.set
@@ -47,6 +80,9 @@ map("n", "<Esc>", "<cmd>nohlsearch<CR>")          -- clear search highlight
 map("n", "<leader>w", "<cmd>w<CR>")               -- save
 map("n", "<leader>q", "<cmd>q<CR>")               -- quit
 map("n", "<leader>e", "<cmd>Explore<CR>")         -- file browser
+map("n", "<leader>f", ":find ")                   -- find a file by name (fuzzy)
+map("n", "<leader>g", ":silent grep! ")           -- search inside files; ]q/[q step through matches
+map("n", "<leader>b", ":buffer ")                 -- switch open file
 map({ "n", "i", "v" }, "<S-Esc>", "<cmd>confirm qa<CR>") -- shut everything down (asks if unsaved)
 -- Splits use the stock Ctrl+W layer (Ctrl+W h/j/k/l, Ctrl+W q), as in keybinds.md
 map("v", "<", "<gv")                              -- keep selection when indenting

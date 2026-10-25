@@ -33,6 +33,9 @@ imagemagick        # builds the fetch logo (fetch-logo)
 fd-find            # fast file search (Debian names it fdfind; linked to fd by the apt role)
 ripgrep            # fast content search
 jq                 # JSON previews
+file               # file type detection (yazi needs it to preview anything)
+7zip               # archive previews and extraction
+poppler-utils      # PDF previews
 
 # Nicer everyday commands:
 bat                # cat with syntax highlighting (batcat; aliased to bat/cat)

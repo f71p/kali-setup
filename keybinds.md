@@ -1,5 +1,5 @@
 
-# Felipe's Keybind Schema
+# flip's Keybind Schema
 
 One set of rules that works the same everywhere: Windows host, Kali in VMware (Xfce), CachyOS (niri / KDE), tmux and Neovim.
 
