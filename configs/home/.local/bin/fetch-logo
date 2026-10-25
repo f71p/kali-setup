@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # fetch-logo [output.gif] — generate the animated neon "glitch" Kali dragon used by `fetch`.
 # Built from Kali's own boot logo on this machine, so no artwork lives in the repo.
-# Default output: ~/.local/share/fetch/logo.gif. Background colour: $FETCH_LOGO_BG (kitty's).
+# Default output: ~/.local/share/fetch/logo.gif. Background colour: $FETCH_LOGO_BG, else kitty.conf's `background`.
 set -euo pipefail
 if [[ ${1:-} == -h || ${1:-} == --help ]]; then
     sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"; exit 0
@@ -39,7 +39,8 @@ rgbsplit 8 "$T/g2.png"; slice "$T/g2.png" 42 "$T/g2s.png"
 rgbsplit 3 "$T/g3.png"; slice "$T/base.png" 99 "$T/g3s.png"
 # 5) Assemble: mostly still, with a quick glitch burst (delays in 1/100 s)
 # GIF has no partial transparency, so draw on the terminal's background colour (kitty.conf) instead
-BG=${FETCH_LOGO_BG:-#1a1b26}
+BG=${FETCH_LOGO_BG:-$(awk '$1 == "background" { bg = $2 } END { print bg }' "$HOME/.config/kitty/kitty.conf" 2>/dev/null)}
+BG=${BG:-#000000}   # kitty's default background
 for f in "$T"/base.png "$T"/g*.png; do convert "$f" -background "$BG" -alpha remove -alpha off "$f"; done
 convert -dispose none \
   -delay 260 "$T/base.png" \
