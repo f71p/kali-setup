@@ -4,6 +4,7 @@ Daily reference for everything this playbook sets up. Keys are written as `Ctrl+
 In tmux, **prefix** means `Ctrl+A` (press, release, then the next key). The scheme behind the keys is in [keybinds.md](keybinds.md):
 **Q** closes, **Shift+Esc** shuts the whole thing down, plain **Esc** only ever backs out.
 
+- [Workflows](#workflows)
 - [My scripts](#my-scripts)
 - [Shell (zsh)](#shell-zsh)
 - [tmux](#tmux)
@@ -13,6 +14,41 @@ In tmux, **prefix** means `Ctrl+A` (press, release, then the next key). The sche
 - [Desktop (XFCE) and VMware](#desktop-xfce-and-vmware)
 - [WSL and Windows Terminal](#wsl-and-windows-terminal)
 - [This playbook](#this-playbook)
+
+---
+
+## Workflows
+
+**Working a target**
+
+| Step | How |
+|---|---|
+| Own tmux session per target | `tmux new -s box` · switch with prefix `Space` · leave with prefix `d`, back with `tmux a -t box` |
+| Keep evidence | `rec box` at the start: everything is logged to `$LOGS/<date>/` until `exit`. Tool output: `-oA $LOGS/scan` etc. |
+| Command + output into notes | prefix `y` (or `Ctrl+Shift+Y` in kitty) copies the last command and its output; paste in your notes |
+| Any output to the clipboard | `cmd \| clip` · a file: `clip file` |
+| Kerberos "clock skew too great" | `timesync <dc>`, afterwards `timesync reset` |
+| Forgot a key | `keys` (e.g. `keys copy`) |
+
+**WSL**
+
+| Situation | What to do |
+|---|---|
+| Reverse shell / listener / `http.server` / Responder needs to be reachable | WSL is on NAT (on purpose): targets can't reach it. Switch on mirrored networking in the WSL Settings app (Networking), then `wsl --shutdown` from Windows. Switch back the same way when done |
+| ARP spoofing and other layer-2 attacks | Use the VM; WSL can't do these even in mirrored mode |
+| VPN (`.ovpn`) | `sudo openvpn file.ovpn` inside Kali: `tun0` works, and tmux shows its IP |
+| Where to keep tools, payloads, loot | In `~` (Linux side), not `/mnt/c`: Defender scans and quarantines files on the Windows drive, and `/mnt/c` is slow |
+| Snapshot before big changes | From Windows: `wsl --export kali-linux D:\backups\kali-<date>.tar` · restore as a copy: `wsl --import kali-restore D:\wsl\kali-restore <file>.tar` |
+| Heavy GUI tools (Burp, BloodHound) | Often better installed on Windows; WSL tools reach them on `localhost` |
+| Opening Kali | From the Terminal app, not the "kali-linux" Start menu entry (that one loses the profile: no font, icons turn into diamonds) |
+
+**Changing the setup**
+
+| Step | How |
+|---|---|
+| Edit a config | In `~/Projects/setup/configs/`, then `./bootstrap.sh --tags dotfiles` |
+| Add a tool | `packages/*.txt`, then `./bootstrap.sh --tags apt` (or `pipx`, `releases`, ...) |
+| Save and share | `git commit` and `git push` in `~/Projects/setup`; on the other machine `git pull` and `./bootstrap.sh --check --diff` first |
 
 ---
 
