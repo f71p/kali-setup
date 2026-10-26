@@ -35,6 +35,7 @@
   args: { chdir: /mnt/c }
   register: wsl_localappdata
   changed_when: false
+  failed_when: wsl_localappdata.stdout is not match('/mnt/')   # cmd.exe can't run: interop off or Windows not on PATH
   check_mode: false   # read-only, so dry runs (--check) see the real paths
 
 - name: Set Windows paths
@@ -79,6 +80,12 @@
         include: "{{ wsl_font_files }}"
       check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
 
+    - name: Create the Windows staging folder
+      ansible.builtin.file:
+        path: "{{ wsl_font_staging }}"
+        state: directory
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
+
     - name: Stage fonts on the Windows side (the Fonts folder can't read WSL paths reliably)
       ansible.builtin.copy:
         src: "{{ wsl_tmp.path }}/{{ item }}"
@@ -92,6 +99,14 @@
         Get-ChildItem \"$env:LOCALAPPDATA\Temp\kali-setup-fonts\" -Filter *.ttf | % { $f.CopyHere($_.FullName, 0x14) }"
       args: { chdir: /mnt/c }
 
+    # CopyHere can finish in the background; wait for it before the staging folder is removed
+    - name: Wait for Windows to install the fonts
+      ansible.builtin.wait_for:
+        path: "{{ wsl_fonts_dir }}/{{ item }}"
+        timeout: 60
+      loop: "{{ wsl_font_files }}"
+      when: not ansible_check_mode   # nothing was installed in a dry run
+
   always:
     - name: Remove temp dir
       ansible.builtin.file:
@@ -104,6 +119,7 @@
       ansible.builtin.file:
         path: "{{ wsl_font_staging }}"
         state: absent
+      check_mode: false   # temp dir only, so dry runs (--check) can see what would be installed
 
 - name: Find Windows Terminal's settings.json
   ansible.builtin.shell: >-
@@ -112,6 +128,11 @@
   register: wsl_wt_settings
   changed_when: false
   check_mode: false   # read-only, so dry runs (--check) see the real paths
+
+- name: Warn when Windows Terminal has no settings yet
+  ansible.builtin.debug:
+    msg: "Windows Terminal's settings.json not found: open Windows Terminal once, then run ./bootstrap.sh --tags wsl"
+  when: wsl_wt_settings.stdout_lines | length == 0
 
 # Keys from keybinds.md and the Nerd Font face (for eza's icons); Windows Terminal's colours and look stay.
 # Backs up settings.json before changing it, keeping the newest {{ dotfiles_backups_kept }}.
